@@ -14,7 +14,7 @@ Route::get('/', function () {
 
 // Setelah login, arahkan ke halaman CRUD pertanyaan admin
 Route::get('/dashboard', function () {
-    return redirect()->route('admin.questions.index'); // ✅ route yang benar
+    return redirect()->route('admin.dashboard'); // ✅ route yang benar
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // Group middleware untuk user yang sudah login (Profile)
@@ -26,6 +26,11 @@ Route::middleware('auth')->group(function () {
 
 // Group route admin dengan prefix "admin" dan nama "admin."
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    // Route untuk dashboard admin
+    Route::get('/dashboard', function () {
+        return view('admin.dashboard'); // Mengarahkan ke view dashboard admin
+    })->name('dashboard'); // Nama route admin.dashboard
+
     // CRUD pertanyaan
     Route::resource('questions', QuestionController::class);
 

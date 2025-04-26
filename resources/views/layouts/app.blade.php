@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+      x-data="{ sidebarOpen: false, sidebarCollapsed: false }"
+      class="h-full">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,73 +13,60 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
+    
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-    <body class="font-sans antialiased bg-gray-100 dark:bg-gray-900" x-data="{ sidebarOpen: false }">
-        <div class="min-h-screen flex">
+<body class="font-sans antialiased bg-gray-100 dark:bg-gray-900">
+    <div class="min-h-screen flex relative">
 
-            <!-- Sidebar -->
-            <div
-                x-show="sidebarOpen"
-                @click.away="sidebarOpen = false"
-                x-transition:enter="transition transform duration-300"
-                x-transition:enter-start="-translate-x-full"
-                x-transition:enter-end="translate-x-0"
-                x-transition:leave="transition transform duration-300"
-                x-transition:leave-start="translate-x-0"
-                x-transition:leave-end="-translate-x-full"
-                class="fixed z-40 inset-y-0 left-0 w-64 bg-white dark:bg-gray-900 shadow-md lg:static lg:translate-x-0 lg:block"
-            >
+        <!-- Sidebar Desktop -->
+        <aside
+            :class="sidebarCollapsed ? 'w-20' : 'w-64'"
+            class="fixed inset-y-0 left-0 z-40 hidden lg:flex flex-col transition-all duration-300 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700">
+            @include('components.admin-sidebar')
+        </aside>
+
+        <!-- Sidebar Mobile -->
+        <div x-show="sidebarOpen" x-cloak class="fixed inset-0 z-50 flex lg:hidden">
+            <!-- Backdrop -->
+            <div @click="sidebarOpen = false" class="fixed inset-0 bg-black bg-opacity-50"></div>
+
+            <!-- Sidebar Panel -->
+            <aside class="relative flex flex-col w-64 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700">
                 @include('components.admin-sidebar')
-            </div>
+            </aside>
+        </div>
 
-            <!-- Overlay Mobile -->
-            <div x-show="sidebarOpen" class="fixed inset-0 bg-black opacity-50 z-30 lg:hidden" @click="sidebarOpen = false"></div>
-
-            <div :class="sidebarOpen ? 'lg:ml-64 ml-0' : 'ml-0'" class="flex-1 flex flex-col transition-all duration-300 ease-in-out relative">
-
-                <!-- Navigation -->
-                @include('layouts.navigation')
-
-                <!-- Page Header -->
+        <!-- Main Content -->
+        <div :class="sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'" class="flex-1 flex flex-col transition-all duration-300">
+            <main class="flex-1 p-6">
                 @isset($header)
-                    <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-                        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-                                {{ $header }}
-                            </h1>
-                        </div>
-                    </header>
+                    <div class="mb-6">
+                        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $header }}</h1>
+                    </div>
                 @endisset
 
-                <!-- Flash Message -->
                 @if (session('success'))
-                    <div class="max-w-7xl mx-auto mt-4 px-4">
-                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-                            {{ session('success') }}
-                        </div>
+                    <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+                        {{ session('success') }}
                     </div>
                 @endif
 
-                <!-- Main Slot -->
-                <main class="flex-1 py-8">
-                    <div class="w-full px-4 sm:px-6 lg:px-8">
+                {{ $slot }}
+            </main>
 
-                        {{ $slot }}
-                    </div>
-                </main>
-
-                <!-- Footer -->
-                <footer class="bg-white border-t border-gray-200 dark:bg-gray-800 dark:border-gray-700 shadow-inner">
-                    <div class="w-full py-4 px-4 flex justify-center items-center text-sm text-gray-500 dark:text-gray-400">
-                        &copy; {{ date('Y') }} Tracer Alumni. Dibuat dengan ❤️ oleh Tim Dewa Frontend.
-                    </div>
-                </footer>
-            </div>
+            <!-- Footer -->
+            <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 text-sm text-center py-4 text-gray-500 dark:text-gray-400">
+                &copy; {{ date('Y') }} Tracer Alumni. Dibuat dengan ❤️ oleh Tim Dewa Frontend.
+            </footer>
         </div>
-    </body>
+    </div>
+</body>
 
 </html>

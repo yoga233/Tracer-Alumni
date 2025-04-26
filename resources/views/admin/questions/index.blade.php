@@ -41,11 +41,18 @@
                                         {{ $question->type ? $question->type->name : 'Tipe tidak ditemukan' }}
                                     </td>
                                     <td class="px-6 py-4 text-center space-x-2">
-                                        <a href="{{ route('admin.questions.edit', $question->id) }}" class="text-blue-500 hover:underline">Edit</a>
+                                        <!-- Edit Icon -->
+                                        <a href="{{ route('admin.questions.edit', $question->id) }}" class="text-blue-500 hover:text-blue-700">
+                                            <i class="fas fa-edit"></i> <!-- Edit Icon -->
+                                        </a>
+
+                                        <!-- Delete Icon -->
                                         <form action="{{ route('admin.questions.destroy', $question->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-red-500 hover:underline">Hapus</button>
+                                            <button type="submit" class="text-red-500 hover:text-red-700">
+                                                <i class="fas fa-trash-alt"></i> <!-- Trash Icon -->
+                                            </button>
                                         </form>
                                     </td>
                                 </tr>
