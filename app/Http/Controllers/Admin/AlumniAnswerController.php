@@ -10,11 +10,12 @@ use Illuminate\Http\Request;
 
 class AlumniAnswerController extends Controller
 {
-    public function index()
-    {
-        $answers = AlumniAnswer::with('question')->latest()->paginate(10);
+    // public function index()
+    // {
+    //     // Ambil semua jawaban
+    //     $answers = AlumniAnswer::with('question')->latest()->paginate(10);
 
-        return view('admin.alumni_answers.index', compact('answers'));
-    }
+    //     return view('admin.alumni_answers.index', compact('answers'));
+    // }
 }
 

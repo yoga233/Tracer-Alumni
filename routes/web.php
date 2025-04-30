@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\AnswerController;
 use App\Http\Controllers\Admin\AlumniAnswerController;
 use App\Http\Controllers\AlumniFormController;
+use App\Http\Controllers\Admin\DashboardController;
 
 // Redirect dari halaman utama ke halaman register
 Route::get('/', function () {
@@ -27,15 +28,25 @@ Route::middleware('auth')->group(function () {
 // Group route admin dengan prefix "admin" dan nama "admin."
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     // Route untuk dashboard admin
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard'); // Mengarahkan ke view dashboard admin
-    })->name('dashboard'); // Nama route admin.dashboard
+    Route::get('/dashboard', [DashboardController::class, 'showdashboard'])->name('dashboard');
+
+    // Route::get('/dashboard', function () {
+    //     return view('admin.dashboard');
+    // })->name('dashboard');
+    
 
     // CRUD pertanyaan
     Route::resource('questions', QuestionController::class);
 
     // Jawaban alumni (semua jawaban) - Tampilkan jawaban alumni dengan showAnswers
-    Route::get('alumni-answers', [AnswerController::class, 'showAnswers'])->name('alumni-answers.index'); 
+    Route::get('alumni-answers', [AnswerController::class, 'showAnswers'])->name('alumni-answers.index');
+    // hapus alumni answers
+    // Route::delete('alumni-answers/{question}/answers/{answer}', [AnswerController::class, 'destroy'])->name('alumni-answers.destroy'); 
+    // Route::delete('/admin/answers/{answer}', [AlumniAnswerController::class, 'destroy'])->name('admin.answers.destroy');
+    // Menghapus submission + jawaban + alumni (jika perlu)
+    Route::delete('/alumni-answers/{submissionId}', [AnswerController::class, 'destroyBySubmission'])->name('alumni_answers.destroy');
+        
+
 
     // Nested route untuk jawaban dari masing-masing pertanyaan
     Route::resource('questions.answers', AnswerController::class);

@@ -16,32 +16,75 @@
                     </button>
                 </div>
 
-                <form method="GET" action="">
-                    <div class="mb-4">
-                        <label class="block text-sm mb-2">Keyword</label>
-                        <input type="text" name="keyword" class="w-full p-2 border border-gray-700 rounded-md bg-gray-800 text-gray-100 placeholder-gray-400" placeholder="Cari sesuatu...">
+                <form method="GET" action="{{ route('admin.alumni-answers.index') }}" class="mb-6 space-y-4">
+
+                    {{-- pencarian keyword pertanyaan --}}
+                    <div>
+                        <label class="block text-sm font-medium text-white">Keyword Pertanyaan</label>
+                        <input type="text" name="keyword" value="{{ request('keyword') }}"
+                            class="w-full p-2 border border-gray-700 rounded-md bg-gray-800 text-white placeholder-gray-400"
+                            placeholder="Cari pertanyaan...">
+                    </div>
+                
+                    {{-- pengisian --}}
+                    <div class="flex space-x-2">
+                        <div class="w-1/2">
+                            <label class="block text-sm font-medium text-white">Waktu Pengisian</label>
+                            <input type="date" name="start_date" value="{{ request('start_date') }}"
+                                class="w-full p-2 border border-gray-700 rounded-md bg-gray-800 text-white">
+                        </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label class="block text-sm mb-2">Tanggal Isi</label>
-                        <input type="date" name="tanggal" class="w-full p-2 border border-gray-700 rounded-md bg-gray-800 text-gray-100" style="color-scheme: dark;">
+                    {{-- tahun lulus --}}
+                    <div class="flex space-x-2">
+                        <div class="w-1/2">
+                            <label class="block text-sm font-medium text-white">Tahun Lulus</label>
+                            <select name="graduation_year" class="w-full p-2 border border-gray-700 rounded-md bg-gray-800 text-white">
+                                {{-- <option value="all">Semua</option>
+                                @foreach (collect($alumniRows)->pluck('alumni.graduation_year')->unique()->filter()->values() as $year)
+                                    <option value="{{ $year }}" {{ request('graduation_year') == $year ? 'selected' : '' }}>
+                                        {{ $year }}
+                                    </option>
+                                @endforeach --}}
+                                <option value="all">Semua</option>
+                                @foreach ($graduationYears as $year)
+                                    <option value="{{ $year }}" {{ request('graduation_year') == $year ? 'selected' : '' }}>
+                                        {{ $year }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
-
+                
+                    {{-- filter status --}}
                     <div class="mb-4">
-                        <label class="block text-sm mb-2">Status</label>
-                        <select name="status" class="w-full p-2 border border-gray-700 rounded-md bg-gray-800 text-gray-100">
-                            <option value="">Semua</option>
-                            <option value="Lengkap">Lengkap</option>
-                            <option value="Belum Lengkap">Belum Lengkap</option>
+                        <label class="block text-sm font-medium text-white" for="status">Status Pekerjaan</label>
+                        <select class="w-full p-2 border border-gray-700 rounded-md bg-gray-800 text-white" name="status" id="status">
+                            <option value="all">Semua</option>
+                            @foreach ($employmentStatuses as $status)
+                                <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
+                                    {{ $status }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
-
-                    <div class="text-right">
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
-                            Cari
+                
+                    <div>
+                        <button type="submit"
+                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-all duration-150">
+                            Filter
                         </button>
                     </div>
                 </form>
+
+                <hr class="my-4 border-gray-700">                
+
+                {{-- //gambarlogo --}}
+
+                <div class="mt-4">
+                    <img src="{{ asset('../assets/logo.png') }}" alt="Logo" class="w-48 h-40 mx-auto border border-gray-700">
+                </div>
+
             </div>
         </div>
 
@@ -72,58 +115,73 @@
                     </button>
                 </div>
 
+                {{-- Table --}}
                 <div class="overflow-auto bg-white dark:bg-gray-900 shadow-xl rounded-xl border border-gray-200 dark:border-gray-700">
+                    
                     <table class="min-w-full table-auto text-sm text-left text-gray-700 dark:text-gray-200" id="dataTable">
                         <thead class="bg-gray-100 dark:bg-gray-800 border-b dark:border-gray-600">
                             <tr>
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap">ID</th>
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">ID</th>
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Nama</th>
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Email</th>
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Jurusan</th>
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Tahun Lulus</th>
                                 @foreach ($questions->take(5) as $question)
-                                    <th class="px-4 py-3 font-semibold whitespace-nowrap">
+                                    <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">
                                         {{ $question->question_text }}
                                     </th>
                                 @endforeach
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Lainnya</th>
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Waktu Isi</th>
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Waktu Isi</th>
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Lainnya</th>
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Aksi</th>
                             </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700" id="dataRows">
+                        </thead>                        
+                
+                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-center" id="dataRows">
                             @foreach ($alumniRows as $index => $row)
                                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
-                                    <td class="px-4 py-2 whitespace-nowrap">{{ $index + 1 }}</td>
-
+                                    <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $index + 1 }}</td>
+                                    <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $row['alumni']->name ?? '-' }}</td>
+                                    <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $row['alumni']->email ?? '-' }}</td>
+                                    <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $row['alumni']->major ?? '-' }}</td>
+                                    <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $row['alumni']->graduation_year ?? '-' }}</td>
                                     @foreach ($questions->take(5) as $question)
-                                        <td class="px-4 py-2 whitespace-nowrap">
+                                        <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">
                                             {{ $row[$question->question_text] ?? '-' }}
                                         </td>
                                     @endforeach
-
-                                    <td class="px-4 py-2 whitespace-nowrap">
-                                        <button
-                                            class="text-blue-600 hover:underline"
-                                            data-row='@json($row)'
-                                            onclick="showDetails(this)">
+                                    <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">
+                                        {{ optional($row['created_at'])->format('d M Y, H:i') ?? '-' }}
+                                    </td>
+                                    <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">
+                                        <button class="text-blue-600 hover:underline" data-row='@json($row)' onclick="showDetails(this)">
                                             Lihat Selengkapnya
                                         </button>
                                     </td>
-
-                                    <td class="px-4 py-2 whitespace-nowrap">
-                                        {{ optional($row['created_at'])->format('d M Y, H:i') ?? '-' }}
+                                    <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">
+                                        <form action="{{ route('admin.alumni_answers.destroy', $row['submission_id']) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus data alumni ini beserta jawabannya?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:scale-125 hover:underline transition-all duration-150">
+                                                Hapus
+                                            </button>
+                                        </form>                                                                           
                                     </td>
                                 </tr>
                             @endforeach
-                        </tbody>
+                        </tbody>                        
                     </table>
-
-                    <!-- No Results Notification -->
+                
+                    <!-- no notification -->
                     <div id="noResults" class="hidden p-4 text-red-600 bg-red-100 rounded-md">
                         Data tidak ditemukan untuk pencarian Anda.
                     </div>
-
-                    <!-- Pagination (Jika diperlukan) -->
+                    <!-- pagination (Jika diperlukan) -->
                     <div class="p-4">
-                        {{-- {{ $pagination->links() }} --}}
+                        {{-- {{ $alumniRows->links() }} --}}
                     </div>
                 </div>
+                
             </div>
         </div>
     </div>
@@ -140,6 +198,12 @@
         function toggleFilter() {
             const sidebar = document.getElementById('filterSidebar');
             sidebar.classList.toggle('translate-x-full');
+        }
+
+        //submit filter
+        function submitFilter() {
+            const form = document.getElementById('filterForm');
+            form.submit();
         }
 
         // Fungsi untuk menampilkan detail jawaban alumni
@@ -172,7 +236,8 @@
                     tr.style.display = '';
                     found = true;
                 } else {
-                    tr.style.display = 'none';
+                    found = false;
+                    tr.style.display = 'data tidak ditemukan,harap masukkan kata kunci pencarian yang sesuai!!';
                 }
             });
 
@@ -184,7 +249,6 @@
                 noResults.classList.add('hidden');
             }
         }
-
 
                 // Fungsi untuk scroll kembali ke atas
                 function scrollToTop() {
