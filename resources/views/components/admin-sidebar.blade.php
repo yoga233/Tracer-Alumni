@@ -27,6 +27,13 @@
             <i class="fas fa-clipboard-list w-5 h-5"></i>
             <span x-show="!sidebarCollapsed" x-transition>Jawaban Alumni</span>
         </a>
+
+        <a href="{{ route('admin.reports.index') }}"
+   class="flex items-center gap-3 p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
+    <i class="fas fa-chart-bar w-5 h-5"></i>
+    <span x-show="!sidebarCollapsed" x-transition>Statistik & Laporan</span>
+</a>
+
     </nav>
 
     <!-- Divider -->

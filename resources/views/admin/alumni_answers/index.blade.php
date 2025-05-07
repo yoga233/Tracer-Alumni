@@ -3,6 +3,19 @@
         <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">
             Jawaban Alumni (Tampilan Tabel)
         </h2>
+        <style>
+            .custom-scrollbar::-webkit-scrollbar {
+                width: 8px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+                background-color: #94a3b8;
+                border-radius: 10px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-track {
+                background-color: transparent;
+            }
+        </style>
+
     </x-slot>
 
     <div class="flex">
@@ -90,6 +103,31 @@
 
         <!-- Main Content -->
         <div class="py-10 flex-1">
+            <!-- Modal Detail Redesain dengan Animasi Transisi -->
+        <div id="detailModal" class="fixed inset-0 z-50 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center hidden opacity-0 transition-opacity duration-300 ease-in-out">
+            <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-4xl p-8 relative overflow-hidden max-h-[90vh] border border-gray-300 dark:border-gray-700">
+                <!-- Header -->
+                <div class="flex justify-between items-start mb-6 border-b pb-4 border-gray-200 dark:border-gray-700">
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white">📋 Detail Jawaban Alumni</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Data lengkap yang diisi oleh alumni</p>
+                    </div>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-red-500 transition text-xl font-bold">&times;</button>
+                </div>
+
+                <!-- Content -->
+                <div id="modalContent" class="space-y-3 text-sm text-gray-800 dark:text-gray-200 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                    <!-- Diisi via JS -->
+                </div>
+
+                <!-- Footer -->
+                <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 text-right">
+                    <button onclick="closeModal()" class="px-5 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition">Tutup</button>
+                </div>
+            </div>
+        </div>
+
+
             <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between mb-4">
                     <!-- Modern Search Bar (on the left) -->
@@ -119,57 +157,68 @@
                 <div class="overflow-auto bg-white dark:bg-gray-900 shadow-xl rounded-xl border border-gray-200 dark:border-gray-700">
                     
                     <table class="min-w-full table-auto text-sm text-left text-gray-700 dark:text-gray-200" id="dataTable">
-                        <thead class="bg-gray-100 dark:bg-gray-800 border-b dark:border-gray-600">
-                            <tr>
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">ID</th>
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Nama</th>
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Email</th>
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Jurusan</th>
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Tahun Lulus</th>
-                                @foreach ($questions->take(5) as $question)
-                                    <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">
-                                        {{ $question->question_text }}
-                                    </th>
-                                @endforeach
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Waktu Isi</th>
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Lainnya</th>
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Aksi</th>
-                            </tr>
-                        </thead>                        
-                
-                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-center" id="dataRows">
-                            @foreach ($alumniRows as $index => $row)
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
-                                    <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $index + 1 }}</td>
-                                    <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $row['alumni']->name ?? '-' }}</td>
-                                    <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $row['alumni']->email ?? '-' }}</td>
-                                    <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $row['alumni']->major ?? '-' }}</td>
-                                    <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $row['alumni']->graduation_year ?? '-' }}</td>
-                                    @foreach ($questions->take(5) as $question)
-                                        <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">
-                                            {{ $row[$question->question_text] ?? '-' }}
-                                        </td>
-                                    @endforeach
-                                    <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">
-                                        {{ optional($row['created_at'])->format('d M Y, H:i') ?? '-' }}
-                                    </td>
-                                    <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">
-                                        <button class="text-blue-600 hover:underline" data-row='@json($row)' onclick="showDetails(this)">
-                                            Lihat Selengkapnya
-                                        </button>
-                                    </td>
-                                    <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">
-                                        <form action="{{ route('admin.alumni_answers.destroy', $row['submission_id']) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus data alumni ini beserta jawabannya?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:scale-125 hover:underline transition-all duration-150">
-                                                Hapus
-                                            </button>
-                                        </form>                                                                           
-                                    </td>
-                                </tr>
+                    <thead class="bg-gray-100 dark:bg-gray-800 border-b dark:border-gray-600">
+                        <tr>
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">ID</th>
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Nama</th>
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Email</th>
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Jurusan</th>
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Tahun Lulus</th>
+                            @foreach ($questions->take(4) as $question)
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">
+                                    {{ $question->question_text }}
+                                </th>
                             @endforeach
-                        </tbody>                        
+                            <!-- Kolom lainnya yang disembunyikan -->
+                            @foreach ($questions->skip(4) as $question)
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600 hidden">
+                                    {{ $question->question_text }}
+                                </th>
+                            @endforeach
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Waktu Isi</th>
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Lainnya</th>
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-center" id="dataRows">
+                        @foreach ($alumniRows as $index => $row)
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $index + 1 }}</td>
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $row['alumni']->name ?? '-' }}</td>
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $row['alumni']->email ?? '-' }}</td>
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $row['alumni']->major ?? '-' }}</td>
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $row['alumni']->graduation_year ?? '-' }}</td>
+                                @foreach ($questions->take(4) as $question)
+                                    <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">
+                                        {{ $row[$question->question_text] ?? '-' }}
+                                    </td>
+                                @endforeach
+                                @foreach ($questions->skip(4) as $question)
+                                    <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600 hidden">
+                                        {{ $row[$question->question_text] ?? '-' }}
+                                    </td>
+                                @endforeach
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">
+                                    {{ optional($row['created_at'])->format('d M Y, H:i') ?? '-' }}
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">
+                                    <button class="text-blue-600 hover:underline" data-row='@json($row)' onclick="showDetails(this)">
+                                        Lihat Selengkapnya
+                                    </button>
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">
+                                    <form action="{{ route('admin.alumni_answers.destroy', $row['submission_id']) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus data alumni ini beserta jawabannya?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:scale-125 hover:underline transition-all duration-150">
+                                            Hapus
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                        
                     </table>
                 
                     <!-- no notification -->
@@ -206,20 +255,70 @@
             form.submit();
         }
 
-        // Fungsi untuk menampilkan detail jawaban alumni
         function showDetails(button) {
             const data = JSON.parse(button.getAttribute('data-row'));
+            const modal = document.getElementById('detailModal');
+            const modalContent = document.getElementById('modalContent');
 
-            let detail = "Detail Jawaban Alumni:\n\n";
+            let html = '';
             Object.entries(data).forEach(([key, value]) => {
                 if (!['created_at', 'submission_id'].includes(key)) {
-                    // Gunakan backticks (`) untuk template literal
-                    detail += `${key}: ${value}\n`;
+                    html += `
+                        <div class="flex justify-between border-b border-gray-300 dark:border-gray-600 py-1">
+                            <span class="font-medium capitalize">${key.replace(/_/g, ' ')}</span>
+                            <span class="text-right">${value || '-'}</span>
+                        </div>
+                    `;
                 }
             });
 
-            alert(detail);
+            modalContent.innerHTML = html;
+
+            // Menambahkan transisi dan memunculkan modal
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.classList.add('opacity-100');
+            }, 50); // Delay untuk efek transisi
+            
+            // Menampilkan semua kolom pertanyaan di tabel
+            showAllColumns();
         }
+
+        function showAllColumns() {
+        const table = document.getElementById('dataTable');
+        const ths = table.querySelectorAll('thead th');
+        ths.forEach((th, index) => {
+            if (index > 5) { // Mulai dari index 6 untuk kolom setelah 4 pertanyaan
+                th.classList.remove('hidden');
+            }
+        });
+
+        const trs = table.querySelectorAll('tbody tr');
+        trs.forEach(tr => {
+            const tds = tr.querySelectorAll('td');
+            tds.forEach((td, index) => {
+                if (index > 5) {
+                    td.classList.remove('hidden');
+                }
+            });
+        });
+    }
+
+
+        // Close modal function remains the same
+        function closeModal() {
+            const modal = document.getElementById('detailModal');
+            modal.classList.remove('opacity-100');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300); 
+        }
+
+
+
+
 
 
         // Fungsi pencarian untuk tabel

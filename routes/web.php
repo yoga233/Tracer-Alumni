@@ -5,56 +5,53 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\AnswerController;
 use App\Http\Controllers\Admin\AlumniAnswerController;
-use App\Http\Controllers\AlumniFormController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\AlumniFormController;
 
-// Redirect dari halaman utama ke halaman register
-Route::get('/', function () {
-    return redirect()->route('register');
-});
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
 
-// Setelah login, arahkan ke halaman CRUD pertanyaan admin
-Route::get('/dashboard', function () {
-    return redirect()->route('admin.dashboard'); // ✅ route yang benar
-})->middleware(['auth', 'verified'])->name('dashboard');
+// 🔁 Redirect halaman utama ke register
+Route::get('/', fn () => redirect()->route('register'));
 
-// Group middleware untuk user yang sudah login (Profile)
+// ✅ Redirect setelah login ke dashboard admin
+Route::get('/dashboard', fn () => redirect()->route('admin.dashboard'))
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+
+// 🔒 Route untuk user yang sudah login (Profile)
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Group route admin dengan prefix "admin" dan nama "admin."
+// 🔐 Admin route group
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-    // Route untuk dashboard admin
+    // 📊 Dashboard Admin
     Route::get('/dashboard', [DashboardController::class, 'showdashboard'])->name('dashboard');
 
-    // Route::get('/dashboard', function () {
-    //     return view('admin.dashboard');
-    // })->name('dashboard');
-    
-
-    // CRUD pertanyaan
+    // ❓ CRUD Pertanyaan
     Route::resource('questions', QuestionController::class);
 
-    // Jawaban alumni (semua jawaban) - Tampilkan jawaban alumni dengan showAnswers
+    // 📝 Jawaban Alumni - daftar & hapus
     Route::get('alumni-answers', [AnswerController::class, 'showAnswers'])->name('alumni-answers.index');
-    // hapus alumni answers
-    // Route::delete('alumni-answers/{question}/answers/{answer}', [AnswerController::class, 'destroy'])->name('alumni-answers.destroy'); 
-    // Route::delete('/admin/answers/{answer}', [AlumniAnswerController::class, 'destroy'])->name('admin.answers.destroy');
-    // Menghapus submission + jawaban + alumni (jika perlu)
-    Route::delete('/alumni-answers/{submissionId}', [AnswerController::class, 'destroyBySubmission'])->name('alumni_answers.destroy');
-        
+    Route::delete('alumni-answers/{submissionId}', [AnswerController::class, 'destroyBySubmission'])->name('alumni_answers.destroy');
 
-
-    // Nested route untuk jawaban dari masing-masing pertanyaan
+    // 🧩 Nested Jawaban per Pertanyaan
     Route::resource('questions.answers', AnswerController::class);
+
+    // 📈 Statistik & Laporan
+    Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
 });
 
-// Route untuk alumni mengisi form
+// 🧑‍🎓 Route untuk alumni isi form
 Route::get('/alumni/form', [AlumniFormController::class, 'showForm'])->name('alumni.form');
 Route::post('/alumni/form', [AlumniFormController::class, 'storeForm'])->name('alumni.form.submit');
 
-// Route auth (dari Laravel Breeze)
+// 🛡️ Auth Routes (Laravel Breeze)
 require __DIR__ . '/auth.php';
