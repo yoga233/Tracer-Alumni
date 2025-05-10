@@ -15,25 +15,23 @@ class AdminSeeder extends Seeder
      */
     public function run()
     {
-        // Menambahkan data dummy untuk tabel users
         User::create([
-            'name' => 'John Doe',
+            'name' => 'Pandoe',
             'email' => 'agung@gmail.com',
-            'password' => Hash::make('12345678'),  // Password harus di-hash
+            'password' => Hash::make('12345678'),  
         ]);
 
         User::create([
-            'name' => 'Jane Smith',
-            'email' => 'jane.smith@example.com',
-            'password' => Hash::make('password456'),
+            'name' => 'Siti Aisyah',
+            'email' => 'sitiaisyah@yahoo.com',
+            'password' => Hash::make('siti1234'),
         ]);
 
         User::create([
-            'name' => 'Alice Johnson',
-            'email' => 'alice.johnson@example.com',
-            'password' => Hash::make('password789'),
+            'name' => 'Budi Santoso',
+            'email' => 'budi.santoso@outlook.com',
+            'password' => Hash::make('budipassword'),
         ]);
-
-        // Menambahkan lebih banyak user sesuai kebutuhan
     }
+
 }

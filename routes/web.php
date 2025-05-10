@@ -9,14 +9,9 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\AlumniFormController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
 
 // 🔁 Redirect halaman utama ke register
-Route::get('/', fn () => redirect()->route('register'));
+Route::get('/', fn () => redirect()->route('login'));
 
 // ✅ Redirect setelah login ke dashboard admin
 Route::get('/dashboard', fn () => redirect()->route('admin.dashboard'))
@@ -38,15 +33,24 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // ❓ CRUD Pertanyaan
     Route::resource('questions', QuestionController::class);
 
+    // 📝 Jawaban Alumni
+    Route::get('admin/alumni-answers', [AnswerController::class, 'kebutuhanFilter'])->name('admin.alumni_answers.index');
+
     // 📝 Jawaban Alumni - daftar & hapus
     Route::get('alumni-answers', [AnswerController::class, 'showAnswers'])->name('alumni-answers.index');
     Route::delete('alumni-answers/{submissionId}', [AnswerController::class, 'destroyBySubmission'])->name('alumni_answers.destroy');
+  
+    // Sudah di dalam prefix('admin') dan name('admin.')
+    Route::get('alumni_answers/detail/{id}', [AnswerController::class, 'detailJawaban'])->name('alumni_answers.detail');
+
+
+
 
     // 🧩 Nested Jawaban per Pertanyaan
     Route::resource('questions.answers', AnswerController::class);
 
     // 📈 Statistik & Laporan
-    Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('reports', [ReportController::class, 'showReport'])->name('reports.showReport');
 });
 
 // 🧑‍🎓 Route untuk alumni isi form

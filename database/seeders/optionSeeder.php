@@ -8,58 +8,29 @@ use Illuminate\Database\Seeder;
 
 class OptionSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
     public function run()
     {
-        $questions = Question::all();
+        $questions = Question::all(); // <- tambahkan ini
 
-        // Opsi untuk pertanyaan tipe radio
-        $radioQuestion = $questions->where('question_text', 'What is your favorite color?')->first();
-        Option::create([
-            'question_id' => $radioQuestion->id,
-            'option_text' => 'Red',
-        ]);
-        Option::create([
-            'question_id' => $radioQuestion->id,
-            'option_text' => 'Blue',
-        ]);
-        Option::create([
-            'question_id' => $radioQuestion->id,
-            'option_text' => 'Green',
-        ]);
-
-        // Opsi untuk pertanyaan tipe checkbox
-        $checkboxQuestion = $questions->where('question_text', 'Select your favorite hobbies.')->first();
-        Option::create([
-            'question_id' => $checkboxQuestion->id,
-            'option_text' => 'Reading',
-        ]);
-        Option::create([
-            'question_id' => $checkboxQuestion->id,
-            'option_text' => 'Swimming',
-        ]);
-        Option::create([
-            'question_id' => $checkboxQuestion->id,
-            'option_text' => 'Traveling',
-        ]);
-
-        // Opsi untuk pertanyaan tipe select
-        $selectQuestion = $questions->where('question_text', 'What is your gender?')->first();
-        Option::create([
-            'question_id' => $selectQuestion->id,
-            'option_text' => 'Male',
-        ]);
-        Option::create([
-            'question_id' => $selectQuestion->id,
-            'option_text' => 'Female',
-        ]);
-        Option::create([
-            'question_id' => $selectQuestion->id,
-            'option_text' => 'Other',
-        ]);
+        $additionalOptions = [
+            'How often do you use our product?' => ['Daily', 'Weekly', 'Monthly', 'Rarely'],
+            'Select all devices you own.' => ['Laptop', 'Smartphone', 'Tablet', 'Smartwatch'],
+            'Which country are you from?' => ['Indonesia', 'Malaysia', 'Singapore', 'Other'],
+            'How satisfied are you with our support?' => ['Very Satisfied', 'Satisfied', 'Neutral', 'Dissatisfied'],
+            'Select your favorite cuisines.' => ['Indonesian', 'Italian', 'Japanese', 'Mexican'],
+            'Which department do you belong to?' => ['IT', 'HR', 'Marketing', 'Finance'],
+        ];
+        
+        foreach ($additionalOptions as $questionText => $options) {
+            $question = $questions->where('question_text', $questionText)->first();
+            if ($question) {
+                foreach ($options as $optionText) {
+                    Option::create([
+                        'question_id' => $question->id,
+                        'option_text' => $optionText,
+                    ]);
+                }
+            }
+        }
     }
 }

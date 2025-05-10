@@ -82,6 +82,11 @@
                 color: white;
             }
 
+            /* @media print {
+                .no-print {
+                    display: none;
+                }
+            } */
             
         </style>
 
@@ -93,100 +98,102 @@
 
             <!-- FILTER PANEL -->
             <div class="bg-gray-800 bg-opacity-60 backdrop-blur-md rounded-2xl p-6 shadow-lg">
-                <form class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <form method="GET" action="{{ route('admin.reports.showReport') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
                     <!-- Jenis Chart -->
                     <div class="flex flex-col">
                         <label class="mb-2 text-sm font-semibold">Jenis Chart</label>
-                        <select class="bg-gray-700 text-white rounded-lg px-4 py-3">
-                            <option>Line</option>
-                            <option selected>Bar</option>
-                            <option>Pie</option>
+                        <select id="chart_type" class="bg-gray-700 text-white rounded-lg px-4 py-3">
+                            <option value="line">Line</option>
+                            <option value="bar" >Bar</option>
+                            <option value="pie">Pie</option>
                         </select>
                     </div>
 
                     <!-- Tahun Lulus -->
-                    <div class="flex flex-col" x-data="multiYear()" x-cloak>
-  <label class="mb-2 text-sm font-semibold">Tahun Lulus</label>
+                        <div class="flex flex-col"
+                        x-data='multiYear(@json($graduationYears), @json($selectedYears))' x-cloak>
+                       <label class="mb-2 text-sm font-semibold">Tahun Lulus</label>
 
-  {{-- tombol pemicu --}}
-  <button
-    @click="open = !open"
-    type="button"
-    class="w-full flex justify-between items-center bg-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none"
-  >
-    <span x-text="selected.length ? `(${selected.length}) selected` : 'Pilih Tahun'"></span>
-    <svg xmlns="http://www.w3.org/2000/svg" 
-         class="h-5 w-5 transform" 
-         :class="{'rotate-180': open}" 
-         fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-            d="M19 9l-7 7-7-7" />
-    </svg>
-  </button>
+                        {{-- tombol pemicu --}}
+                        <button
+                          @click="open = !open"
+                          type="button"
+                          class="w-full flex justify-between items-center bg-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none"
+                        >
+                          <span x-text="selected.length ? `(${selected.length}) selected` : 'Pilih Tahun'"></span>
+                          <svg xmlns="http://www.w3.org/2000/svg" 
+                              class="h-5 w-5 transform" 
+                              :class="{'rotate-180': open}" 
+                              fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
 
-  {{-- dropdown --}}
-  <div
-    x-show="open"
-    @click.away="open = false"
-    class="mt-2 bg-gray-800 rounded-lg shadow-lg z-10"
-    style="display: none;"
-  >
-    {{-- search box --}}
-    <div class="p-2">
-      <input
-        x-model="search"
-        type="text"
-        placeholder="Cari tahun..."
-        class="w-full bg-gray-700 text-white rounded-md px-3 py-2 focus:outline-none"
-      />
-    </div>
-    {{-- list opsi --}}
-    <ul class="max-h-60 overflow-auto">
-      <template x-for="year in filtered" :key="year">
-        <li
-          @click="toggle(year)"
-          class="flex items-center px-4 py-2 cursor-pointer hover:bg-gray-700"
-        >
-          <input
-            type="checkbox"
-            class="form-checkbox h-5 w-5 text-blue-500"
-            :checked="selected.includes(year)"
-            @click.stop="toggle(year)"
-          />
-          <span class="ml-3 text-white select-none" x-text="year"></span>
-        </li>
-      </template>
-      <template x-if="filtered.length === 0">
-        <li class="px-4 py-2 text-gray-400">Tidak ada hasil</li>
-      </template>
-    </ul>
-  </div>
+                        {{-- dropdown --}}
+                        <div
+                          x-show="open"
+                          @click.away="open = false"
+                          class="mt-2 bg-gray-800 rounded-lg shadow-lg z-10"
+                          style="display: none;" >
 
-  {{-- hidden inputs untuk form submission --}}
-  <template x-for="year in selected" :key="year">
-    <input type="hidden" name="graduation_year[]" :value="year" />
-  </template>
-</div>
+                          {{-- search box --}}
+                          <div class="p-2">
+                            <input
+                              x-model="search"
+                              type="text"
+                              placeholder="Cari tahun..."
+                              class="w-full bg-gray-700 text-white rounded-md px-3 py-2 focus:outline-none" />
+                          </div>
 
+                          {{-- list opsi --}}
+                          <ul class="max-h-60 overflow-auto">
+                            <template x-for="year in filtered" :key="year">
+                              <li
+                                @click="toggle(year)"
+                                class="flex items-center px-4 py-2 cursor-pointer hover:bg-gray-700">
+                                <input
+                                  type="checkbox"
+                                  class="form-checkbox h-5 w-5 text-blue-500"
+                                  :checked="selected.includes(year)"
+                                  @click.stop="toggle(year)"
+                                />
+                                <span class="ml-3 text-white select-none" x-text="year"></span>
+                              </li>
+                            </template>
+                            <template x-if="filtered.length === 0">
+                              <li class="px-4 py-2 text-gray-400">Tidak ada hasil</li>
+                            </template>
+                          </ul>
 
+                          {{-- pilih semua checkbox --}}
+                           <div class="flex justify-between items-center px-4 py-2 border-t border-gray-700 text-sm">
+                            <button @click="selectAll()" class="text-blue-400 hover:underline">Pilih Semua</button>
+                            <button @click="reset()" class="text-red-400 hover:underline">Reset</button>
+                          </div>
+                        </div>
 
+                        {{-- membuat hidden input --}}
+                        <template x-for="year in selected" :key="year">
+                          <input type="hidden" name="graduation_year[]" :value="year" />
+                        </template>
+                      </div>  
 
-
-
-
-
-                    <!-- Status Pekerjaan -->
+                      {{-- Status Pekerjaan --}}
                     <div class="flex flex-col">
-                        <label class="mb-2 text-sm font-semibold">Status Pekerjaan</label>
-                        <select class="bg-gray-700 text-white rounded-lg px-4 py-3">
-                            <option selected>Semua</option>
-                            <option>Sudah Bekerja</option>
-                            <option>Belum Bekerja</option>
-                        </select>
-                    </div>
+                      <label class="mb-2 text-sm font-semibold">Status Pekerjaan</label>
+                      <select name="employment_status" id="employment_status" class="bg-gray-700 text-white rounded-lg px-4 py-3">
+                        <option value="semua" {{ $selectedStatus == 'semua' ? 'selected' : '' }}>Semua</option>
+                      @foreach ($employmentStatuses as $status)
+                        <option value="{{ $status }}" {{ $selectedStatus == $status ? 'selected' : '' }}>
+                            {{ ucfirst($status) }}
+                        </option>
+                      @endforeach
+                    </select>                    
+                  </div>
 
-                    <!-- Tombol Submit -->
+                  {{-- tombol tampil data --}}
                     <div class="flex items-end">
                         <button type="submit" class="w-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-bold py-3 rounded-xl shadow-lg transition transform hover:scale-105">
                             <i class="fa-solid fa-magnifying-glass mr-2"></i> Tampilkan Data
@@ -194,6 +201,13 @@
                     </div>
                 </form>
             </div>
+
+          
+          <!-- Pesan jika tidak ada data -->
+          <div id="no-data-message" class="hidden mt-6 px-6 py-4 rounded-xl bg-gray-500 text-white text-center text-lg font-semibold shadow-md">
+            Tidak ada data yang tersedia dengan filter yang dipilih.
+          </div>
+
 
             <!-- CHART CONTAINER -->
             <div class="bg-gray-800 rounded-2xl p-8 shadow-lg">
@@ -212,7 +226,6 @@
                         <option>JPEG</option>
                         <option>WebP</option>
                         <option>PDF</option>
-                        <option>SVG</option>
                     </select>
                 </div>
                 <div class="flex gap-4">
@@ -225,82 +238,151 @@
                 </div>
             </div>
 
-    <!-- CHART.JS & JS -->
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script>
-        const ctx = document.getElementById('chart').getContext('2d');
-        const chart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['2020', '2021', '2022', '2023'],
-                datasets: [{
-                    label: 'Jumlah Alumni',
-                    data: [20, 35, 50, 40],
-                    backgroundColor: ['#3B82F6', '#9333EA', '#10B981', '#F59E0B'],
-                    borderColor: '#fff',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                animation: { duration: 1000, easing: 'easeOutBounce' },
-                plugins: {
-                    legend: { labels: { color: 'white' } },
-                    tooltip: { backgroundColor: '#1f2937', titleColor: '#fff', bodyColor: '#fff' }
-                },
-                scales: {
-                    x: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } },
-                    y: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } },
-                }
-            }
-        });
+      const datalabels = @json($labels);
+      const datacounts = @json($counts);
+      const selectedStatus = @json($selectedStatus); 
+  
+      let chart;
 
-        document.getElementById('download-btn').addEventListener('click', function () {
-            const format = document.getElementById('download_format').value;
-            const canvas = document.getElementById('chart');
-
-            if (format === 'pdf') {
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF();
-                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, 30, 190, 160);
-                pdf.save('chart.pdf');
-            } else {
-                const dataUrl = canvas.toDataURL(`image/${format}`);
-                const link = document.createElement('a');
-                link.href = dataUrl;
-                link.download = `chart.${format}`;
-                link.click();
-            }
-        });
-
-        // Inisialisasi Choices.js dengan checkbox-style item
-
-function multiYear() {
-    return {
-      open: false,
-      search: '',
-      years: [2020, 2021, 2022, 2023],
-      selected: @json(request()->input('graduation_year', [])),
-      toggle(year) {
-        if (this.selected.includes(year)) {
-          this.selected = this.selected.filter(y => y !== year)
-        } else {
-          this.selected.push(year)
-        }
-      },
-      get filtered() {
-        return this.years.filter(y =>
-          y.toString().includes(this.search)
-        )
+      function toggleDownloadButton(isDisabled) {
+          const downloadBtn = document.getElementById('download-btn');
+          downloadBtn.disabled = isDisabled;
+          downloadBtn.classList.toggle('opacity-50', isDisabled);
       }
+  
+  function renderChart(type) {
+    const ctx = document.getElementById('chart').getContext('2d');
+    const noDataMessage = document.getElementById('no-data-message');
+    const canvas = document.getElementById('chart');
+
+    if (chart) {
+        chart.destroy();
     }
-  }
+    // Jika data kosong, sembunyikan canvas dan tampilkan pesan
+    const isEmpty = !Array.isArray(datacounts) || datacounts.length === 0 || datacounts.every(count => count === 0);
+
+    if (isEmpty) {
+        canvas.style.display = 'none';         
+        noDataMessage.classList.remove('hidden');
+        toggleDownloadButton(true);
+        return;
+    } else {
+        canvas.style.display = 'block';        
+        noDataMessage.classList.add('hidden'); 
+        toggleDownloadButton(false);  
+    }
+
+    let chartLabel = 'Jumlah Alumni ';
+    if (selectedStatus !== 'semua') {
+        chartLabel += ' ' + selectedStatus;
+    }
+
+    if (Array.isArray(datalabels) && datalabels.length > 0) {
+        chartLabel += ' Tahun: ' + datalabels.join(', ');
+    }
 
 
+    chart = new Chart(ctx, {
+        type: type,
+        data: {
+            labels: datalabels,
+            datasets: [{
+                label: chartLabel + " | status kerja : "+selectedStatus,
+                data: datacounts,
+                backgroundColor: ['#3B82F6', '#9333EA', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#A3A3A3', '#F472B6'],
+                borderColor: '#fff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            animation: { duration: 1000, easing: 'easeOutBounce' },
+            plugins: {
+                legend: { labels: { color: 'white' } },
+                tooltip: { backgroundColor: '#1f2937', titleColor: '#fff', bodyColor: '#fff' }
+            },
+            scales: {
+                x: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                y: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+            }
+          }
+        });
+    }
+        const chartTypeSelect = document.getElementById('chart_type');
+        chartTypeSelect.value = 'bar';
+        renderChart('bar');
 
+      document.getElementById('chart_type').addEventListener('change', function () {
+          renderChart(this.value);
+      });
+  
+      // document.getElementById('employment_status').addEventListener('change', function () {
+      //     this.form.submit(); 
+      // });
+      document.getElementById('download-btn').addEventListener('click', function () {
+    let format = document.getElementById('download_format').value.toLowerCase();  // Biar pasti lowercase
+    const canvas = document.getElementById('chart');
+
+    if (format === 'pdf') {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('landscape');
+        const imgData = canvas.toDataURL('image/png');
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        pdf.addImage(imgData, 'PNG', 10, 10, pageWidth - 20, pageHeight - 20);
+        pdf.save('chart.pdf');
+    } else {
+        const validFormats = ['png', 'jpeg', 'webp'];
+        if (!validFormats.includes(format)) {
+            alert('Format tidak didukung untuk gambar.');
+            return;
+        }
+        const mimeType = `image/${format}`;
+        const dataUrl = canvas.toDataURL(mimeType);
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = `chart.${format}`;
+        link.click();
+    }
+});
+        // Fungsi untuk menampilkan tahun lulus
+        function multiYear(allYears = [], preSelected = []) {
+        return {
+        open: false,
+        all: allYears,
+        selected: preSelected,
+        search: '',
+        get filtered() {
+            //jika pencarian kosong maka tampilkan semua tahun
+            return this.all.filter(year => 
+            //nyari kolom year mengandung teks pencarian di searchnya
+                year.toString().includes(this.search.toLowerCase())
+            );
+        },
+        toggle(year) {
+            if (this.selected.includes(year)) {
+                //tahun sudah dipilih maka hapus dari daftar
+                this.selected = this.selected.filter(y => y !== year);
+            } else {
+              //buat blm ada push ke variabel year
+                this.selected.push(year);
+            }
+          },
+        selectAll() {
+            this.selected = [...this.all];
+          },
+        reset() {
+            this.selected = [];
+            this.search = '';
+          }
+        }
+      }
 
     </script>
 </x-app-layout>
