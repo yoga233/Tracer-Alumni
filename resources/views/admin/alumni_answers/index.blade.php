@@ -3,50 +3,154 @@
         <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">
             Jawaban Alumni (Tampilan Tabel)
         </h2>
+        <style>
+            .custom-scrollbar::-webkit-scrollbar {
+                width: 8px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+                background-color: #94a3b8;
+                border-radius: 10px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-track {
+                background-color: transparent;
+            }
+        </style>
+
     </x-slot>
 
     <div class="flex">
         <!-- Sidebar Filter -->
         <div id="filterSidebar" class="fixed inset-y-0 right-0 w-80 bg-gray-900 text-gray-100 shadow-lg transform translate-x-full transition-transform duration-300 z-50 overflow-y-auto">
             <div class="p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-semibold">Filter</h3>
-                    <button onclick="toggleFilter()" class="text-gray-300 hover:text-gray-400">
-                        ✖
+                <div class="flex items-center justify-between mb-4 border-b border-gray-600 pb-2">
+                    <h3 class="text-lg font-semibold text-white">Filter</h3>
+                    
+                    <button 
+                      type="button"
+                      onclick="toggleFilter()" 
+                      class="text-gray-400 hover:text-red-500 transition duration-200 ease-in-out"
+                      aria-label="Tutup Filter"
+                      title="Tutup Filter">
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke-width="2" 
+                        stroke="currentColor" 
+                        class="w-6 h-6" >
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
                     </button>
-                </div>
+                  </div>                  
+                
 
-                <form method="GET" action="">
-                    <div class="mb-4">
-                        <label class="block text-sm mb-2">Keyword</label>
-                        <input type="text" name="keyword" class="w-full p-2 border border-gray-700 rounded-md bg-gray-800 text-gray-100 placeholder-gray-400" placeholder="Cari sesuatu...">
+                {{-- Form Filter --}}
+                <form method="GET" action="{{ route('admin.alumni-answers.index') }}" class="mb-6 space-y-4">
+
+                    {{-- pencarian keyword pertanyaan --}}
+                    <div>
+                        <label class="block text-sm font-medium text-white">Keyword Pertanyaan</label>
+                        <input type="text" id="filterKeyword" name="keyword" value="{{ request('keyword') }}"
+                            class="w-full p-2 border border-gray-700 rounded-md bg-gray-800 text-white placeholder-gray-400"
+                            placeholder="Cari pertanyaan...">
+                    </div>
+                
+                    {{-- pengisian --}}
+                    <div class="flex space-x-2">
+                        <div class="w-1/2">
+                            <label class="block text-sm font-medium text-white">Waktu Pengisian</label>
+                            <input type="date" name="start_date" value="{{ request('start_date') }}"
+                                class="w-full p-2 border border-gray-700 rounded-md bg-gray-800 text-white">
+                        </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label class="block text-sm mb-2">Tanggal Isi</label>
-                        <input type="date" name="tanggal" class="w-full p-2 border border-gray-700 rounded-md bg-gray-800 text-gray-100" style="color-scheme: dark;">
+                    {{-- tahun lulus --}}
+                    <div class="flex space-x-2">
+                        <div class="w-1/2">
+                            <label class="block text-sm font-medium text-white">Tahun Lulus</label>
+                            <select name="graduation_year" class="w-full p-2 border border-gray-700 rounded-md bg-gray-800 text-white">
+                                <option value="all">Semua</option>
+                                @foreach ($graduationYears as $year)
+                                    <option value="{{ $year }}" {{ request('graduation_year') == $year ? 'selected' : '' }}>
+                                        {{ $year }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
-
+                
+                    {{-- filter status --}}
                     <div class="mb-4">
-                        <label class="block text-sm mb-2">Status</label>
-                        <select name="status" class="w-full p-2 border border-gray-700 rounded-md bg-gray-800 text-gray-100">
-                            <option value="">Semua</option>
-                            <option value="Lengkap">Lengkap</option>
-                            <option value="Belum Lengkap">Belum Lengkap</option>
+                        <label class="block text-sm font-medium text-white" for="status">Status Pekerjaan</label>
+                        <select class="w-full p-2 border border-gray-700 rounded-md bg-gray-800 text-white" name="status" id="status">
+                            <option value="all">Semua</option>
+                            @foreach ($employmentStatuses as $status)
+                                <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
+                                    {{ $status }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
-
-                    <div class="text-right">
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
-                            Cari
-                        </button>
+                
+                    <div class="flex space-x-32">
+                        <div>
+                            <button type="submit"
+                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-all duration-150">
+                                Filter
+                            </button>
+                        </div>
+    
+                        <div>
+                            <button type="button" onclick="resetFilter()"
+                                class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-all duration-150">
+                                Reset
+                            </button>
+                        </div>                    
                     </div>
+
                 </form>
+
+                
+                <hr class="my-4 border-gray-700">                
+
+                {{-- //gambarlogo --}}
+
+                <div class="mt-4">
+                    <img src="{{ asset('../assets/logo.png') }}" alt="Logo" class="w-48 h-40 mx-auto border border-gray-700">
+                </div>
+
             </div>
         </div>
 
+
+
         <!-- Main Content -->
         <div class="py-10 flex-1">
+            <!-- Modal Detail Redesain dengan Animasi Transisi -->
+         <div id="detailModal" class="fixed inset-0 z-50 bg-black bg-opacity-60 backdrop-blur-sm items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 ease-in-out hidden">
+            <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-4xl p-8 relative overflow-hidden max-h-[90vh] border border-gray-300 dark:border-gray-700">
+                <!-- Header -->
+                <div class="flex justify-between items-start mb-6 border-b pb-4 border-gray-200 dark:border-gray-700">
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white">📋 Detail Jawaban Alumni</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Data lengkap yang diisi oleh alumni</p>
+                    </div>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-red-500 transition text-4xl font-bold">&times;</button>
+                </div>
+
+                <!-- Content -->
+                <div id="modalContent" class="space-y-3 text-sm text-gray-800 dark:text-gray-200 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                    <!-- Diisi via JS -->
+                </div>
+
+                <!-- Footer -->
+                <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 text-right">
+                    <button onclick="closeModal()" class="px-5 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition">Tutup</button>
+                </div>
+            </div>
+        </div>
+
+
             <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between mb-4">
                     <!-- Modern Search Bar (on the left) -->
@@ -55,7 +159,7 @@
                             type="text"
                             id="tableSearchInput"
                             class="w-full p-3 pl-10 pr-4 border border-gray-700 rounded-md bg-gray-800 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                            placeholder="Cari jawaban atau ID..."
+                            placeholder="Cari jawaban alumni..."
                             onkeyup="searchTable()"
                         >
                         <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -72,58 +176,91 @@
                     </button>
                 </div>
 
+                {{-- Table --}}
                 <div class="overflow-auto bg-white dark:bg-gray-900 shadow-xl rounded-xl border border-gray-200 dark:border-gray-700">
+                    
                     <table class="min-w-full table-auto text-sm text-left text-gray-700 dark:text-gray-200" id="dataTable">
-                        <thead class="bg-gray-100 dark:bg-gray-800 border-b dark:border-gray-600">
-                            <tr>
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap">ID</th>
-                                @foreach ($questions->take(5) as $question)
-                                    <th class="px-4 py-3 font-semibold whitespace-nowrap">
-                                        {{ $question->question_text }}
-                                    </th>
-                                @endforeach
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Lainnya</th>
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Waktu Isi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700" id="dataRows">
-                            @foreach ($alumniRows as $index => $row)
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
-                                    <td class="px-4 py-2 whitespace-nowrap">{{ $index + 1 }}</td>
+                    <thead class="bg-gray-100 dark:bg-gray-800 border-b dark:border-gray-600">
+                        <tr>
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">ID</th>
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Nama</th>
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Email</th>
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Jurusan</th>
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Tahun Lulus</th>
+                            {{-- <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Status kerja</th> --}}
+                            @foreach ($questions->take(4) as $question)
+                                <th data-question  @if ($withQuestions) data-question-matched @endif
+                                class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">
 
-                                    @foreach ($questions->take(5) as $question)
-                                        <td class="px-4 py-2 whitespace-nowrap">
-                                            {{ $row[$question->question_text] ?? '-' }}
-                                        </td>
-                                    @endforeach
-
-                                    <td class="px-4 py-2 whitespace-nowrap">
-                                        <button
-                                            class="text-blue-600 hover:underline"
-                                            data-row='@json($row)'
-                                            onclick="showDetails(this)">
-                                            Lihat Selengkapnya
-                                        </button>
-                                    </td>
-
-                                    <td class="px-4 py-2 whitespace-nowrap">
-                                        {{ optional($row['created_at'])->format('d M Y, H:i') ?? '-' }}
-                                    </td>
-                                </tr>
+                                    {{ $question->question_text }}
+                                    
+                                </th>
                             @endforeach
-                        </tbody>
-                    </table>
-
-                    <!-- No Results Notification -->
+                            <!-- Kolom lainnya yang disembunyikan -->
+                            @foreach ($questions->skip(4) as $question)
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600 hidden">
+                                    {{ $question->question_text }}
+                                </th>
+                            @endforeach
+                            
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Waktu Isi</th>
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Lainnya</th>
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-center" id="dataRows">
+                        @foreach ($alumniRows as $index => $row)
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $index + 1 }}</td>
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $row['alumni']->name ?? '-' }}</td>
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $row['alumni']->email ?? '-' }}</td>
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $row['alumni']->major ?? '-' }}</td>
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $row['alumni']->graduation_year ?? '-' }}</td>
+                              
+                                @foreach ($questions->take(4) as $question)
+                                    <td data-question @if ($withQuestions)  data-question-matched @endif  
+                                    class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">
+                                    
+                                        {{ $row[$question->question_text] ?? '-' }}
+                                    
+                                    </td>
+                                @endforeach
+                                @foreach ($questions->skip(4) as $question)
+                                    <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600 hidden">
+                                        {{ $row[$question->question_text] ?? '-' }}
+                                    </td>
+                                @endforeach
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">
+                                    {{ optional($row['created_at'])->format('d M Y, H:i') ?? '-' }}
+                                </td>
+                                {{-- untuk melihat detailnya --}}
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">
+                                     <button class="text-blue-600 hover:underline" onclick="loadDetails({{ $row['submission_id'] }})">Lihat Selengkapnya</button>
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">
+                                    <form action="{{ route('admin.alumni_answers.destroy', $row['submission_id']) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus data alumni ini beserta jawabannya?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:scale-125 hover:underline transition-all duration-150">
+                                            Hapus
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                
+                    <!-- no notification -->
                     <div id="noResults" class="hidden p-4 text-red-600 bg-red-100 rounded-md">
                         Data tidak ditemukan untuk pencarian Anda.
                     </div>
-
-                    <!-- Pagination (Jika diperlukan) -->
-                    <div class="p-4">
-                        {{-- {{ $pagination->links() }} --}}
+                    <!-- pagination (Jika diperlukan) -->
+                    <div class="p-4">  
+                        {{-- {{ $alumniRows->links() }} --}}
                     </div>
                 </div>
+                
             </div>
         </div>
     </div>
@@ -142,23 +279,133 @@
             sidebar.classList.toggle('translate-x-full');
         }
 
-        // Fungsi untuk menampilkan detail jawaban alumni
-        function showDetails(button) {
-            const data = JSON.parse(button.getAttribute('data-row'));
-
-            let detail = "Detail Jawaban Alumni:\n\n";
-            Object.entries(data).forEach(([key, value]) => {
-                if (!['created_at', 'submission_id'].includes(key)) {
-                    // Gunakan backticks (`) untuk template literal
-                    detail += `${key}: ${value}\n`;
-                }
-            });
-
-            alert(detail);
+        //submit filter
+        function submitFilter() {
+            const form = document.getElementById('filterForm');
+            form.submit();
         }
 
+        // reset
+        function resetFilter(){
+            window.location.href = "{{ route('admin.alumni-answers.index') }}";
+        }
 
-        // Fungsi pencarian untuk tabel
+        // menyembunyikan filter
+        const withQuestions = @json($withQuestions);
+        document.addEventListener('DOMContentLoaded', () => {
+            if (withQuestions) {
+                const allQuestionCols = document.querySelectorAll('th[data-question], td[data-question]');
+                allQuestionCols.forEach(el => el.classList.add('hidden'));
+                const matchingCols = document.querySelectorAll('th[data-question-matched], td[data-question-matched]');
+                matchingCols.forEach(el => el.classList.remove('hidden'));
+            }
+        });
+    //ambil semua data modal
+    const loadDetails = async (submissionId) => {   
+        const modal = document.getElementById('detailModal');
+        const modalContent = document.getElementById('modalContent');
+        const response = await fetch(`/admin/alumni_answers/detail/${submissionId}`);
+        const textResponse = await response.text();
+
+        // console.log(textResponse);
+
+        let data;
+        try {
+            data = JSON.parse(textResponse);
+            // console.log(data);
+        } catch (error) {
+            console.error('Gagal parse JSON:', error);
+            return;
+        }
+
+        const alumniLabels = {
+            name: 'Nama',
+            email: 'Email',
+            major: 'Jurusan',
+            graduation_year: 'Angkatan',
+            employment_status: 'Status Pekerjaan',
+            phone_number: 'Nomor Telepon',
+            address: 'Alamat'
+        };
+
+        let html = `  
+            <div class="overflow-y-auto max-h-[60vh] pr-2 custom-scrollbar">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-gray-300 dark:border-gray-200 bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100">
+                            <th class="py-2 px-3 font-semibold text-center text-sm border-r border-gray-300 dark:border-gray-600 w-1/3">PERTANYAAN</th>
+                            <th class="py-2 px-3 text-center text-sm">JAWABAN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            `;
+        if (data.alumni && typeof data.alumni === 'object') {
+            Object.entries(alumniLabels).forEach(([field, label]) => {
+                html += `
+                    <tr class="border-b border-gray-300 dark:border-gray-600">
+                        <th class="py-2 px-3 font-medium text-lg border-r border-gray-300 dark:border-gray-600 align-top">${label}</th>
+                        <td class="py-2 px-3 text-lg whitespace-pre-line">${data.alumni[field] || '-'}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        if (Array.isArray(data.alumniAnswers)) {
+            data.alumniAnswers.forEach(({ question, answer }) => {
+                html += `
+                    <tr class="border-b border-gray-300 dark:border-gray-600">
+                        <th class="py-2 px-3 font-medium text-lg border-r border-gray-300 dark:border-gray-600 align-top">${question}</th>
+                        <td class="py-2 px-3 text-lg whitespace-pre-line">${answer || '-'}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+        modalContent.innerHTML = html;
+
+        modal.classList.remove('hidden', 'pointer-events-none', 'opacity-0');
+        modal.classList.add('flex');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modal.classList.add('opacity-100');
+        }, 50);
+    }
+
+    //     function showAllColumns() {
+    //     const table = document.getElementById('dataTable');
+    //     const ths = table.querySelectorAll('thead th');
+    //     ths.forEach((th, index) => {
+    //         if (index > 5) { // mulai dari index 6 untuk kolom setelah 4 pertanyaan
+    //             th.classList.remove('hidden');
+    //         }
+    //     });
+
+    //     const trs = table.querySelectorAll('tbody tr');
+    //     trs.forEach(tr => {
+    //         const tds = tr.querySelectorAll('td');
+    //         tds.forEach((td, index) => {
+    //             if (index > 5) {
+    //                 td.classList.remove('hidden');
+    //             }
+    //         });
+    //     });
+    // }
+
+        function closeModal() {
+            const modal = document.getElementById('detailModal');
+            modal.classList.remove('opacity-100');
+            modal.classList.add('opacity-0','pointer-events-none');
+            setTimeout(() => {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }, 300); 
+        }
+
         function searchTable() {
             const input = document.getElementById('tableSearchInput');
             const filter = input.value.toLowerCase();
@@ -167,8 +414,20 @@
             let found = false;
 
             trs.forEach(tr => {
-                const text = tr.textContent.toLowerCase();
-                if (text.includes(filter)) {
+                let match = false;
+                const tds = tr.querySelectorAll('td');
+                
+                tds.forEach(td => {
+                    // sembunyikan kolom
+                    if (td.classList.contains('hidden')) return;
+
+                    const text = td.textContent.toLowerCase();
+                    if (text.includes(filter)) {
+                        match = true;
+                    }
+                });
+
+                if (match) {
                     tr.style.display = '';
                     found = true;
                 } else {
@@ -176,7 +435,6 @@
                 }
             });
 
-            // Menampilkan notifikasi jika tidak ditemukan
             const noResults = document.getElementById('noResults');
             if (!found) {
                 noResults.classList.remove('hidden');

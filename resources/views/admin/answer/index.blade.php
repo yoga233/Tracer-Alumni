@@ -1,4 +1,4 @@
-<x-app-layout>
+{{-- <x-app-layout>
     <x-slot name="header">
         <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">
             Jawaban untuk Pertanyaan: {{ $question->question_text }}
@@ -25,7 +25,7 @@
                                     <form action="{{ route('admin.answers.destroy', [$question, $answer]) }}" method="POST" style="display:inline;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-red-600">Hapus</button>
+                                        <button type="submit" class="text-red-600">Happus</button>
                                     </form>
                                 </td>
                             </tr>
@@ -35,4 +35,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-app-layout> --}}

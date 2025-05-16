@@ -29,6 +29,7 @@
                                 <th class="px-6 py-3">No</th>
                                 <th class="px-6 py-3">Pertanyaan</th>
                                 <th class="px-6 py-3">Tipe</th>
+                                <th class="px-6 py-3">Wajib</th>
                                 <th class="px-6 py-3 text-center">Aksi</th>
                             </tr>
                         </thead>
@@ -38,7 +39,10 @@
                                     <td class="px-6 py-4">{{ $index + 1 }}</td>
                                     <td class="px-6 py-4">{{ $question->question_text }}</td>
                                     <td class="px-6 py-4">
-                                        {{ $question->type ? $question->type->name : 'Tipe tidak ditemukan' }}
+                                        {{ $question->question_type_id ? $question->questiontype->name : 'Tipe tidak ditemukan' }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        {{ $question->is_required ? 'Ya' : 'Tidak' }}
                                     </td>
                                     <td class="px-6 py-4 text-center space-x-2">
                                         <!-- Edit Icon -->

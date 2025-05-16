@@ -46,6 +46,39 @@
 
                 <form action="{{ route('alumni.form.submit') }}" method="POST" class="space-y-6">
                     @csrf
+                    {{-- statis question alumni --}}
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div>
+                                <label for="name" class="block font-bold text-lg">Nama <span class="text-red-600">*</span></label>
+                                <input type="text" id="name" name="name" required
+                                    class="form-input w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+    
+                            <div>
+                                <label for="email" class="block font-bold text-lg">Email <span class="text-red-600">*</span></label>
+                                <input type="email" id="email" name="email" required
+                                    class="form-input w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                        </div>
+                    
+
+                        <div class="space-y-4">
+                            <div>
+                                <label for="major" class="block font-bold text-lg">Program Studi / Major <span class="text-red-600">*</span></label>
+                                <input type="text" id="major" name="major" required
+                                    class="form-input w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+    
+                            <div>
+                                <label for="graduation_year" class="block font-bold text-lg">Tahun Lulus <span class="text-red-600">*</span></label>
+                                <input type="number" id="graduation_year" name="graduation_year" min="1900" max="2099" step="1" required
+                                    class="form-input w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- dinamis question --}}
 
                     @if (!empty($questions) && $questions->count())
                         @foreach ($questions as $index => $question)
@@ -54,74 +87,74 @@
                                     <span class="font-bold text-lg">{{ $index + 1 }}. </span>{{ $question->question_text }} <span class="text-red-600">*</span>
                                 </label>
 
-                                @if ($question->type->name == 'text')
+                                @if ($question->questiontype && $question->questiontype->name == 'text')
                                     <input type="text" name="answers[{{ $question->id }}]" required
                                         class="form-input w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
 
-                                @elseif ($question->type->name == 'textarea')
+                                @elseif ($question->questiontype && $question->questiontype->name == 'textarea')
                                     <textarea name="answers[{{ $question->id }}]" rows="4" required
                                         class="form-textarea w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
 
-                                @elseif ($question->type->name == 'radio' && is_array($question->options))
+                                    @elseif ($question->questiontype && $question->questiontype->name == 'radio')
                                     <div class="space-y-2">
                                         @foreach ($question->options as $option)
                                             <label class="inline-flex items-center">
-                                                <input type="radio" name="answers[{{ $question->id }}]" value="{{ $option }}" required class="form-radio text-blue-600">
-                                                <span class="ml-2">{{ $option }}</span>
+                                                <input type="radio" name="answers[{{ $question->id }}]" value="{{ $option->option_text }}" required class="form-radio text-blue-600">
+                                                <span class="ml-2">{{ $option->option_text }}</span>
                                             </label><br>
                                         @endforeach
                                     </div>
 
-                                @elseif ($question->type->name == 'checkbox' && is_array($question->options))
+                                    @elseif ($question->questiontype && $question->questiontype->name == 'checkbox')
                                     <div class="space-y-2">
                                         @foreach ($question->options as $option)
                                             <label class="inline-flex items-center">
-                                                <input type="checkbox" name="answers[{{ $question->id }}][]" value="{{ $option }}" class="form-checkbox text-blue-600">
-                                                <span class="ml-2">{{ $option }}</span>
+                                                <input type="checkbox" name="answers[{{ $question->id }}][]" value="{{ $option->option_text }}" class="form-checkbox w-5 h-5 text-blue-600">
+                                                <span class="ml-2">{{ $option->option_text }}</span>
                                             </label><br>
                                         @endforeach
                                     </div>
-
-                                @elseif ($question->type->name == 'select' && is_array($question->options))
+                                
+                                @elseif ($question->questiontype && $question->questiontype->name == 'select' )
                                     <select name="answers[{{ $question->id }}]" required
                                         class="form-select w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                                         @foreach ($question->options as $option)
-                                            <option value="{{ $option }}">{{ $option }}</option>
+                                            <option value="{{ $option->id }}">{{ $option->option_text }}</option>
                                         @endforeach
                                     </select>
 
-                                @elseif ($question->type->name == 'scale' && is_array($question->options))
+                                @elseif ($question->questiontype && $question->questiontype->name == 'scale')
                                     <div class="flex gap-4 items-center">
                                         @foreach ($question->options as $option)
                                             <label class="flex flex-col items-center">
-                                                <input type="radio" name="answers[{{ $question->id }}]" value="{{ $option }}" required class="form-radio text-blue-600">
-                                                <span class="mt-1 text-sm">{{ $option }}</span>
+                                                <input type="radio" name="answers[{{ $question->id }}]" value="{{ $option->option_text }}" required class="form-radio text-blue-600">
+                                                <span class="mt-1 text-sm">{{ $option->option_text }}</span>
                                             </label>
                                         @endforeach
                                     </div>
-
-                                @elseif ($question->type->name == 'matrix' && is_array($question->options['rows']) && is_array($question->options['columns']))
+                            
+                                    @elseif ($question->questiontype && $question->questiontype->name == 'matrix')                                
                                     <div class="overflow-x-auto">
-                                        <table class="table-auto border w-full text-sm text-center">
-                                            <thead class="bg-gray-100">
+                                        <table class="min-w-full divide-y divide-gray-300">
+                                            <thead class="bg-gray-50">
                                                 <tr>
-                                                    <th class="border px-2 py-2 text-left">Pernyataan</th>
-                                                    @foreach ($question->options['columns'] as $column)
-                                                        <th class="border px-2 py-2">{{ $column }}</th>
+                                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pernyataan</th>
+                                                    @foreach ($question->columns as $column)
+                                                        <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $column }}</th>
                                                     @endforeach
                                                 </tr>
                                             </thead>
-                                            <tbody>
-                                                @foreach ($question->options['rows'] as $rowIndex => $rowText)
+                                            <tbody class="bg-white divide-y divide-gray-200">
+                                                @foreach ($question->rows as $row)
                                                     <tr>
-                                                        <td class="border px-2 py-2 text-left">{{ $rowText }}</td>
-                                                        @foreach ($question->options['columns'] as $colIndex => $column)
-                                                            <td class="border px-2 py-2">
-                                                                <input type="radio"
-                                                                    name="answers[{{ $question->id }}][{{ $rowIndex }}]"
-                                                                    value="{{ $column }}"
-                                                                    required
-                                                                    class="form-radio text-blue-600">
+                                                        <td class="px-4 py-2 whitespace-nowrap text-sm font-semibold text-gray-700">{{ $row }}</td>
+                                                        @foreach ($question->columns as $column)
+                                                            <td class="px-4 py-2 whitespace-nowrap text-center">
+                                                                <input type="radio" 
+                                                                    name="answers[{{ $question->id }}][{{ $row }}]" 
+                                                                    value="{{ $column }}" 
+                                                                    required 
+                                                                    class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
                                                             </td>
                                                         @endforeach
                                                     </tr>
@@ -129,8 +162,8 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                @endif
-
+                                @endif                                
+                               
                                 @error('answers.' . $question->id)
                                     <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
                                 @enderror
@@ -147,7 +180,7 @@
                     </div>
                 </form>
             </div>
-
+            
         </div>
     </div>
 

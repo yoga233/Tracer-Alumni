@@ -9,18 +9,14 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    // Migration untuk question_types table
 public function up(): void
 {
     Schema::create('question_types', function (Blueprint $table) {
-        $table->id(); // Primary key
-        $table->string('name'); // Nama tipe pertanyaan, misalnya text, textarea, dsb.
+        $table->id();
+        $table->string('name');
         $table->timestamps();
     });
 }
-
-
-
     /**
      * Reverse the migrations.
      */

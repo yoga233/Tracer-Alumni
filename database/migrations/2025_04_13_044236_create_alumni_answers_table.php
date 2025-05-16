@@ -10,9 +10,11 @@ class CreateAlumniAnswersTable extends Migration
     {
         Schema::create('alumni_answers', function (Blueprint $table) {
             $table->id();
-            $table->uuid('submission_id'); // Tambahan kolom untuk identifikasi setiap pengisian
+            // $table->uuid('submission_id');
+            $table->foreignId('submission_id')->constrained()->onDelete('cascade');
             $table->foreignId('question_id')->constrained()->onDelete('cascade');
-            $table->text('answer'); // Kolom untuk menyimpan jawaban alumni
+            // $table->foreignId('question_type_id')->constrained()->onDelete('cascade');
+            $table->text('answer'); 
             $table->timestamps();
         });
     }
