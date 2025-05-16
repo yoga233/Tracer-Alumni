@@ -1,86 +1,86 @@
 <x-app-layout>
-  <x-slot name="header">
-    <h2 class="text-3xl font-semibold text-gray-100">
+  <x-slot name="header" >
+    <h2 class="text-3xl h-8 font-semibold text-gray-100">
       Dashboard Alumni
     </h2>
   </x-slot>
   
-  <div class="bg-gray-900 min-h-screen py-8 text-gray-100">
+  <div class="bg-gray-300 min-h-screen py-8 text-gray-100">
     <div class="max-w-7xl mx-auto px-4">
       <!-- Cards Statistik -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-gray-800 border-l-4 border-indigo-500 p-6 rounded-xl shadow-lg flex items-center justify-between transition-transform hover:scale-105">
+        <div class="bg-gray-200 border-l-4 border-gray-700 p-6 rounded-xl shadow-lg flex items-center justify-between transition-transform hover:scale-105">
           <div>
-            <p class="text-sm text-gray-400">Total alumni</p>
-            <h3 class="text-2xl font-bold">{{ $alumni }}</h3>
+            <p class="text-sm text-gray-700 font-bold">Total alumni</p>
+            <h3 class="text-2xl  text-gray-700 font-bold">{{ $alumni }}</h3>
           </div>
-          <span class="text-3xl">👁️</span>
+          <span class="text-3xl  bg-gray-300 rounded-lg shadow-lg">👁️</span>
         </div>
-        <div class="bg-gray-800 border-l-4 border-green-500 p-6 rounded-xl shadow-lg flex items-center justify-between transition-transform hover:scale-105">
+        <div class="bg-gray-200 border-l-4 border-gray-700 p-6 rounded-xl shadow-lg flex items-center justify-between transition-transform hover:scale-105">
           <div>
-            {{-- <p class="text-sm text-gray-400">Sales</p> --}}
-            <h3 class="text-2xl font-bold">80</h3>
+            <p class="text-sm text-gray-700 font-bold">Dummy</p>
+            <h3 class="text-2xl  text-gray-700 font-bold">80</h3>
           </div>
-          <span class="text-3xl">🛒</span>
+          <span class="text-3xl  bg-gray-300 rounded-lg shadow-lg">🛒</span>
         </div>
-        <div class="bg-gray-800 border-l-4 border-yellow-500 p-6 rounded-xl shadow-lg flex items-center justify-between transition-transform hover:scale-105">
+        <div class="bg-gray-200 border-l-4 border-gray-700 p-6 rounded-xl shadow-lg flex items-center justify-between transition-transform hover:scale-105">
           <div>
-            {{-- <p class="text-sm text-gray-400">Comments</p> --}}
-            <h3 class="text-2xl font-bold">284</h3>
+            <p class="text-sm text-gray-700 font-bold">Dummy</p>
+            <h3 class="text-2xl text-gray-700 font-bold">284</h3>
           </div>
-          <span class="text-3xl">💬</span>
+          <span class="text-3xl bg-gray-300 rounded-lg shadow-lg ">💬</span>
         </div>
-        <div class="bg-gray-800 border-l-4 border-pink-500 p-6 rounded-xl shadow-lg flex items-center justify-between transition-transform hover:scale-105">
+        <div class="bg-gray-200 border-l-4  border-gray-700 p-6 rounded-xl shadow-lg flex items-center justify-between transition-transform hover:scale-105">
           <div>
-            {{-- <p class="text-sm text-gray-400">Earning</p> --}}
-            <h3 class="text-2xl font-bold">$7,842</h3>
+            <p class="text-sm text-gray-700 font-bold">Dummy</p>
+            <h3 class="text-2xl text-gray-700 font-bold ">$7,842</h3>
           </div>
-          <span class="text-3xl">💵</span>
+          <span class="text-3xl  bg-gray-300 rounded-lg shadow-lg ">💵</span>
         </div>
       </div>
 
      <!-- Charts -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-  <div class="bg-gray-800 border border-gray-700 p-6 rounded-xl shadow-lg transition-transform hover:scale-105">
-    <h3 class="text-lg font-semibold text-gray-100 mb-4 text-center border-b border-gray-700 pb-2">
+  <div class=" bg-gray-200 border border-gray-700 p-6 rounded-xl shadow-lg transition-transform hover:scale-105">
+    <h3 class="text-lg font-semibold text-gray-700 mb-4 text-center border-b border-gray-700 pb-2">
       📊 Statistik Status Alumni
     </h3>
     <canvas id="pieChart" class="w-full h-64"></canvas>
     @if($employment_status->isEmpty())
-      <p class="text-center text-gray-400 mt-4 italic">Data alumni belum tersedia..</p>
+      <p class="text-center text-gray-700 mt-4 italic">Data alumni belum tersedia..</p>
     @endif
-    <button id="downloadPieChart" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-6 rounded-lg shadow-md transition">
+    <button id="downloadPieChart" class="mt-4 bg-indigo-600 hover:bg-indigo-700  py-2 px-6 rounded-lg shadow-md transition">
       Download Pie Chart
     </button>
   </div>
 
-  <div class="bg-gray-800 border border-gray-700 p-6 rounded-xl shadow-lg transition-transform hover:scale-105">
-    <h3 class="text-lg font-semibold text-gray-100 mb-4 text-center border-b border-gray-700 pb-2">
+  <div class="bg-gray-200 border border-gray-700 p-6 rounded-xl shadow-lg transition-transform hover:scale-105">
+    <h3 class="text-lg font-semibold text-gray-700 mb-4 text-center border-b border-gray-700 pb-2">
       📊 Jumlah Alumni per Status Pekerjaan
     </h3>
     <canvas id="barChart" class="w-full h-64"></canvas>
-    <button id="downloadBarChart" class="mt-4 bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded-lg shadow-md transition">
+    <button id="downloadBarChart" class="mt-4  bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-6 rounded-lg shadow-md transition">
       Download Bar Chart
     </button>
   </div>
 
-  <div class="bg-gray-800 border border-gray-700 p-6 rounded-xl shadow-lg transition-transform hover:scale-105">
-    <h3 class="text-lg font-semibold text-gray-100 mb-4 text-center border-b border-gray-700 pb-2">
+  <div class="bg-gray-200 border border-gray-700 p-6 rounded-xl shadow-lg transition-transform hover:scale-105">
+    <h3 class="text-lg font-semibold text-gray-700 mb-4 text-center border-b border-gray-700 pb-2">
       📈 Perkembangan Alumni per Angkatan
     </h3>
     <canvas id="lineChart" class="w-full h-64"></canvas>
-    <button id="downloadLineChart" class="mt-4 bg-yellow-600 hover:bg-yellow-700 text-white py-2 px-6 rounded-lg shadow-md transition">
+    <button id="downloadLineChart" class="mt-4  bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-6 rounded-lg shadow-md transition">
       Download Line Chart
     </button>
   </div>
 
-  <div class="bg-gray-800 border border-gray-700 p-6 rounded-xl shadow-lg transition-transform hover:scale-105">
-    <h3 class="text-lg font-semibold text-gray-100 mb-4 text-center border-b border-gray-700 pb-2">
+  <div class="bg-gray-200 border border-gray-700 p-6 rounded-xl shadow-lg transition-transform hover:scale-105">
+    <h3 class="text-lg font-semibold text-gray-700 mb-4 text-center border-b border-gray-700 pb-2">
       🧭 Perbandingan Alumni Berdasarkan Jurusan
     </h3>
     <canvas id="radarChart" class="w-full h-64"></canvas>
-    <button id="downloadRadarChart" class="mt-4 bg-pink-600 hover:bg-pink-700 text-white py-2 px-6 rounded-lg shadow-md transition">
+    <button id="downloadRadarChart" class="mt-4  bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-6 rounded-lg shadow-md transition">
       Download Radar Chart
     </button>
   </div>
@@ -93,7 +93,7 @@
   
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const darkTick = '#E5E7EB';
+      const darkTick = '#000';
       const darkGrid = 'rgba(229,231,235,0.2)';
       const cfg = (ctx, type, data, opts) => new Chart(ctx, { type, data, options: opts });
   
@@ -172,7 +172,7 @@
                 color: darkTick
               },
               grid: {
-                color: 'rgba(255,255,255,0.1)'
+                color: '#000'
               }
             }
           }
