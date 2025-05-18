@@ -1,6 +1,17 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-3xl font-extrabold text-white tracking-tight">📊 Laporan Statistik</h2>
+        <div class="mb-6 flex items-start gap-4 animate-fancy-in">
+            <div class="border-l-4 border-blue-600 pl-4">
+                <h2 class="text-3xl font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fas fa-chart-bar text-blue-600"></i>
+                    Laporan Statistik
+                </h2>
+                <p class="text-sm text-gray-600 mt-1">
+                    Visualisasi data lulusan berdasarkan tahun, status pekerjaan, dan tipe grafik yang dipilih.
+                </p>
+            </div>
+        </div>
+
     </x-slot>
 
     <!-- Head CDN -->
@@ -10,16 +21,14 @@
         
         <style>
             .choices__inner {
-                background-color: #374151 !important; /* gray-700 */
-                color: #fff !important;
-                border: 1px solid #4B5563 !important; /* gray-600 */
-                border-radius: 0.5rem !important; /* rounded-lg */
-                min-height: 3rem !important;
-                padding-left: 1rem;
+                background-color: #f9fafb !important; /* gray-50 */
+                color: #1f2937 !important;            /* gray-800 */
+                border: 1px solid #d1d5db !important; /* gray-300 */
             }
 
+
             .choices__list--multiple .choices__item {
-                background-color: #2563EB !important; /* blue-600 */
+                background-color: #3b82f6 !important; /* blue-500 */
                 border: none !important;
                 color: white;
                 font-size: 0.875rem;
@@ -29,189 +38,180 @@
             }
 
             .choices__list--dropdown {
-                background-color: #1F2937 !important; /* gray-800 */
-                color: white;
+                background-color: #ffffff !important;
+                color: #1f2937;
             }
 
             .choices__input {
                 background-color: transparent !important;
-                color: white !important;
+                color: #1f2937 !important;
             }
 
             .choices[data-type*="select-multiple"] .choices__button {
-                color: white !important;
+                color: #1f2937 !important;
             }
 
-            /* Tambahan styling agar opsi tampil seperti ada checkbox */
             .choices__list--dropdown .choices__item--selectable::before {
                 content: '';
                 display: inline-block;
                 width: 1rem;
                 height: 1rem;
                 margin-right: 0.75rem;
-                border: 2px solid #9CA3AF; /* gray-400 */
+                border: 2px solid #9ca3af;
                 border-radius: 0.2rem;
                 background-color: transparent;
                 vertical-align: middle;
             }
 
             .choices__list--dropdown .choices__item--selectable.is-highlighted::before {
-                border-color: #3B82F6; /* blue-500 saat hover */
+                border-color: #3b82f6;
             }
 
-            .choices__list--multiple .choices__item {
-                background-color: #2563EB !important; /* blue-600 */
-                border: none !important;
-                color: white;
-                font-size: 0.875rem;
-                padding: 0.3rem 0.75rem;
-                border-radius: 0.375rem;
-                margin: 0.2rem 0.3rem;
-            }
-
-            /* Checklist aktif */
             .choices__list--dropdown .choices__item--selectable[data-value].choices__item--selectable--checked::before {
-                background-color: #3B82F6;
-                border-color: #3B82F6;
-                box-shadow: inset 0 0 0 2px #1F2937;
+                background-color: #3b82f6;
+                border-color: #3b82f6;
+                box-shadow: inset 0 0 0 2px #ffffff;
             }
 
-            /* Text item dropdown */
             .choices__list--dropdown .choices__item--selectable {
                 padding-left: 1.5rem;
-                color: white;
+                color: #1f2937;
             }
-
-            /* @media print {
-                .no-print {
-                    display: none;
-                }
-            } */
-            
         </style>
+
 
     
     </x-slot>
 
-    <div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white py-12 px-4 sm:px-6 lg:px-8">
+    <div class="min-h-screen bg-gradient-to-br from-white via-gray-50 to-white text-gray-900 py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-7xl mx-auto space-y-10">
 
             <!-- FILTER PANEL -->
-            <div class="bg-gray-800 bg-opacity-60 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+            <div class="bg-white bg-opacity-90 backdrop-blur-md rounded-2xl p-6 shadow-lg">
                 <form method="GET" action="{{ route('admin.reports.showReport') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
                     <!-- Jenis Chart -->
                     <div class="flex flex-col">
-                        <label class="mb-2 text-sm font-semibold">Jenis Chart</label>
-                        <select id="chart_type" class="bg-gray-700 text-white rounded-lg px-4 py-3">
+                        <label for="chart_type" class="mb-2 text-sm font-semibold text-gray-800">Jenis Chart</label>
+                        <select id="chart_type"
+                            class="bg-white text-gray-800 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
                             <option value="line">Line</option>
-                            <option value="bar" >Bar</option>
+                            <option value="bar">Bar</option>
                             <option value="pie">Pie</option>
                         </select>
                     </div>
 
-                    <!-- Tahun Lulus -->
-                        <div class="flex flex-col"
-                        x-data='multiYear(@json($graduationYears), @json($selectedYears))' x-cloak>
-                       <label class="mb-2 text-sm font-semibold">Tahun Lulus</label>
 
-                        {{-- tombol pemicu --}}
+                    <!-- Tahun Lulus -->
+                    <div class="flex flex-col"
+                            x-data='multiYear(@json($graduationYears), @json($selectedYears))' x-cloak>
+                        <label class="mb-2 text-sm font-semibold text-gray-800">Tahun Lulus</label>
+
+                        {{-- Tombol pemicu --}}
                         <button
-                          @click="open = !open"
-                          type="button"
-                          class="w-full flex justify-between items-center bg-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none"
+                            @click="open = !open"
+                            type="button"
+                            class="w-full flex justify-between items-center bg-white text-gray-800 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none shadow-sm"
                         >
-                          <span x-text="selected.length ? `(${selected.length}) selected` : 'Pilih Tahun'"></span>
-                          <svg xmlns="http://www.w3.org/2000/svg" 
-                              class="h-5 w-5 transform" 
-                              :class="{'rotate-180': open}" 
-                              fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <span x-text="selected.length ? `(${selected.length}) selected` : 'Pilih Tahun'"></span>
+                            <svg xmlns="http://www.w3.org/2000/svg" 
+                                class="h-5 w-5 transform text-gray-500" 
+                                :class="{'rotate-180': open}" 
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                  d="M19 9l-7 7-7-7" />
-                          </svg>
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
                         </button>
 
-                        {{-- dropdown --}}
+                        {{-- Dropdown --}}
                         <div
-                          x-show="open"
-                          @click.away="open = false"
-                          class="mt-2 bg-gray-800 rounded-lg shadow-lg z-10"
-                          style="display: none;" >
-
-                          {{-- search box --}}
-                          <div class="p-2">
+                            x-show="open"
+                            @click.away="open = false"
+                            class="mt-2 bg-white rounded-lg shadow-lg z-10 border border-gray-300"
+                            style="display: none;"
+                        >
+                            {{-- Search box --}}
+                            <div class="p-2">
                             <input
-                              x-model="search"
-                              type="text"
-                              placeholder="Cari tahun..."
-                              class="w-full bg-gray-700 text-white rounded-md px-3 py-2 focus:outline-none" />
-                          </div>
+                                x-model="search"
+                                type="text"
+                                placeholder="Cari tahun..."
+                                class="w-full bg-white text-gray-800 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                            </div>
 
-                          {{-- list opsi --}}
-                          <ul class="max-h-60 overflow-auto">
+                            {{-- List opsi --}}
+                            <ul class="max-h-60 overflow-auto divide-y divide-gray-100">
                             <template x-for="year in filtered" :key="year">
-                              <li
+                                <li
                                 @click="toggle(year)"
-                                class="flex items-center px-4 py-2 cursor-pointer hover:bg-gray-700">
+                                class="flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100"
+                                >
                                 <input
-                                  type="checkbox"
-                                  class="form-checkbox h-5 w-5 text-blue-500"
-                                  :checked="selected.includes(year)"
-                                  @click.stop="toggle(year)"
+                                    type="checkbox"
+                                    class="form-checkbox h-5 w-5 text-blue-500"
+                                    :checked="selected.includes(year)"
+                                    @click.stop="toggle(year)"
                                 />
-                                <span class="ml-3 text-white select-none" x-text="year"></span>
-                              </li>
+                                <span class="ml-3 text-gray-800 select-none" x-text="year"></span>
+                                </li>
                             </template>
-                            <template x-if="filtered.length === 0">
-                              <li class="px-4 py-2 text-gray-400">Tidak ada hasil</li>
-                            </template>
-                          </ul>
 
-                          {{-- pilih semua checkbox --}}
-                           <div class="flex justify-between items-center px-4 py-2 border-t border-gray-700 text-sm">
-                            <button @click="selectAll()" class="text-blue-400 hover:underline">Pilih Semua</button>
-                            <button @click="reset()" class="text-red-400 hover:underline">Reset</button>
-                          </div>
+                            <template x-if="filtered.length === 0">
+                                <li class="px-4 py-2 text-gray-500">Tidak ada hasil</li>
+                            </template>
+                            </ul>
+
+                            {{-- Tombol pilih semua & reset --}}
+                            <div class="flex justify-between items-center px-4 py-2 border-t border-gray-200 text-sm bg-gray-50">
+                            <button @click="selectAll()" class="text-blue-600 hover:underline">Pilih Semua</button>
+                            <button @click="reset()" class="text-red-600 hover:underline">Reset</button>
+                            </div>
                         </div>
 
-                        {{-- membuat hidden input --}}
+                        {{-- Hidden input untuk data yang dipilih --}}
                         <template x-for="year in selected" :key="year">
-                          <input type="hidden" name="graduation_year[]" :value="year" />
+                            <input type="hidden" name="graduation_year[]" :value="year" />
                         </template>
-                      </div>  
+                    </div>
+  
 
                       {{-- Status Pekerjaan --}}
-                    <div class="flex flex-col">
-                      <label class="mb-2 text-sm font-semibold">Status Pekerjaan</label>
-                      <select name="employment_status" id="employment_status" class="bg-gray-700 text-white rounded-lg px-4 py-3">
-                        <option value="semua" {{ $selectedStatus == 'semua' ? 'selected' : '' }}>Semua</option>
-                      @foreach ($employmentStatuses as $status)
-                        <option value="{{ $status }}" {{ $selectedStatus == $status ? 'selected' : '' }}>
-                            {{ ucfirst($status) }}
-                        </option>
-                      @endforeach
-                    </select>                    
-                  </div>
+                        <div class="flex flex-col">
+                            <label for="employment_status" class="mb-2 text-sm font-semibold text-gray-800">Status Pekerjaan</label>
+                            <select name="employment_status" id="employment_status"
+                                class="bg-white text-gray-800 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
+                                <option value="semua" {{ $selectedStatus == 'semua' ? 'selected' : '' }}>Semua</option>
+                                @foreach ($employmentStatuses as $status)
+                                <option value="{{ $status }}" {{ $selectedStatus == $status ? 'selected' : '' }}>
+                                    {{ ucfirst($status) }}
+                                </option>
+                                @endforeach
+                            </select>
+                        </div>
+
 
                   {{-- tombol tampil data --}}
                     <div class="flex items-end">
-                        <button type="submit" class="w-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-bold py-3 rounded-xl shadow-lg transition transform hover:scale-105">
+                      <button type="submit"
+                            class="w-full bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white font-semibold py-3 rounded-xl shadow-md transition-transform transform hover:scale-105">
                             <i class="fa-solid fa-magnifying-glass mr-2"></i> Tampilkan Data
                         </button>
                     </div>
+
                 </form>
             </div>
 
           
           <!-- Pesan jika tidak ada data -->
-          <div id="no-data-message" class="hidden mt-6 px-6 py-4 rounded-xl bg-gray-500 text-white text-center text-lg font-semibold shadow-md">
+          <div id="no-data-message" class="hidden mt-6 px-6 py-4 rounded-xl bg-yellow-100 text-gray-900 text-center text-lg font-semibold shadow-md">
             Tidak ada data yang tersedia dengan filter yang dipilih.
           </div>
 
 
             <!-- CHART CONTAINER -->
-            <div class="bg-gray-800 rounded-2xl p-8 shadow-lg">
-                <h3 class="text-xl font-bold mb-6 text-center">📈 Statistik Data</h3>
+            <div class="bg-white rounded-2xl p-8 shadow-md border border-gray-200">
+                <h3 class="text-xl font-bold mb-6 text-center text-gray-800">📈 Statistik Data</h3>
                 <div id="chart-container" class="w-full h-97">
                     <canvas id="chart"></canvas>
                 </div>
@@ -220,20 +220,23 @@
             <!-- DOWNLOAD SECTION -->
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
                 <div class="flex items-center space-x-4">
-                    <label class="font-medium text-sm">Format Download</label>
-                    <select id="download_format" class="bg-gray-700 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-400">
-                        <option>PNG</option>
-                        <option>JPEG</option>
-                        <option>WebP</option>
-                        <option>PDF</option>
+                    <label class="font-medium text-sm text-gray-700">Format Download</label>
+                    <select id="download_format"
+                    class="bg-white text-gray-800 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-400 shadow-sm">
+                    <option>PNG</option>
+                    <option>JPEG</option>
+                    <option>WebP</option>
+                    <option>PDF</option>
                     </select>
                 </div>
                 <div class="flex gap-4">
-                    <button id="download-btn" class="flex items-center bg-green-500 hover:bg-green-600 text-white px-5 py-3 rounded-xl shadow-md transition transform hover:scale-105">
-                        <i class="fa-solid fa-download mr-2"></i> Download Grafik
+                    <button id="download-btn"
+                    class="flex items-center bg-green-500 hover:bg-green-600 text-white px-5 py-3 rounded-xl shadow-md transition-transform hover:scale-105">
+                    <i class="fa-solid fa-download mr-2"></i> Download Grafik
                     </button>
-                    <button onclick="window.print()" class="flex items-center bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-3 rounded-xl shadow-md transition transform hover:scale-105">
-                        <i class="fa-solid fa-print mr-2"></i> Cetak Laporan
+                    <button onclick="window.print()"
+                    class="flex items-center bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-3 rounded-xl shadow-md transition-transform hover:scale-105">
+                    <i class="fa-solid fa-print mr-2"></i> Cetak Laporan
                     </button>
                 </div>
             </div>
@@ -256,64 +259,84 @@
           downloadBtn.classList.toggle('opacity-50', isDisabled);
       }
   
-  function renderChart(type) {
-    const ctx = document.getElementById('chart').getContext('2d');
-    const noDataMessage = document.getElementById('no-data-message');
-    const canvas = document.getElementById('chart');
+      function renderChart(type) {
+        const ctx = document.getElementById('chart').getContext('2d');
+        const noDataMessage = document.getElementById('no-data-message');
+        const canvas = document.getElementById('chart');
 
-    if (chart) {
-        chart.destroy();
-    }
-    // Jika data kosong, sembunyikan canvas dan tampilkan pesan
-    const isEmpty = !Array.isArray(datacounts) || datacounts.length === 0 || datacounts.every(count => count === 0);
+        if (chart) {
+            chart.destroy();
+        }
 
-    if (isEmpty) {
-        canvas.style.display = 'none';         
-        noDataMessage.classList.remove('hidden');
-        toggleDownloadButton(true);
-        return;
-    } else {
-        canvas.style.display = 'block';        
-        noDataMessage.classList.add('hidden'); 
-        toggleDownloadButton(false);  
-    }
+        const isEmpty = !Array.isArray(datacounts) || datacounts.length === 0 || datacounts.every(count => count === 0);
 
-    let chartLabel = 'Jumlah Alumni ';
-    if (selectedStatus !== 'semua') {
-        chartLabel += ' ' + selectedStatus;
-    }
+        if (isEmpty) {
+            canvas.style.display = 'none';
+            noDataMessage.classList.remove('hidden');
+            toggleDownloadButton(true);
+            return;
+        } else {
+            canvas.style.display = 'block';
+            noDataMessage.classList.add('hidden');
+            toggleDownloadButton(false);
+        }
 
-    if (Array.isArray(datalabels) && datalabels.length > 0) {
-        chartLabel += ' Tahun: ' + datalabels.join(', ');
-    }
+        let chartLabel = 'Jumlah Alumni ';
+        if (selectedStatus !== 'semua') {
+            chartLabel += ' ' + selectedStatus;
+        }
 
+        if (Array.isArray(datalabels) && datalabels.length > 0) {
+            chartLabel += ' Tahun: ' + datalabels.join(', ');
+        }
 
-    chart = new Chart(ctx, {
-        type: type,
-        data: {
+        // Tentukan warna berdasarkan tipe chart
+        const colors = ['#3B82F6', '#9333EA', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#A3A3A3', '#F472B6'];
+        const singleColor = '#3B82F6'; // warna default untuk line chart
+
+        const datasetConfig = {
+            label: chartLabel + " | status kerja : " + selectedStatus,
+            data: datacounts,
+            borderColor: singleColor,
+            backgroundColor: type === 'line' ? 'transparent' : colors,
+            fill: false,
+            tension: 0.3,
+            pointBackgroundColor: singleColor,
+            pointBorderColor: '#fff',
+            borderWidth: 3
+        };
+
+        chart = new Chart(ctx, {
+            type: type,
+            data: {
             labels: datalabels,
-            datasets: [{
-                label: chartLabel + " | status kerja : "+selectedStatus,
-                data: datacounts,
-                backgroundColor: ['#3B82F6', '#9333EA', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#A3A3A3', '#F472B6'],
-                borderColor: '#fff',
-                borderWidth: 2
-            }]
-        },
-        options: {
+            datasets: [datasetConfig]
+            },
+            options: {
             responsive: true,
             animation: { duration: 1000, easing: 'easeOutBounce' },
             plugins: {
-                legend: { labels: { color: 'white' } },
-                tooltip: { backgroundColor: '#1f2937', titleColor: '#fff', bodyColor: '#fff' }
+                legend: { labels: { color: '#374151' } },
+                tooltip: {
+                backgroundColor: '#f9fafb',
+                titleColor: '#1f2937',
+                bodyColor: '#1f2937'
+                }
             },
             scales: {
-                x: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } },
-                y: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                x: {
+                ticks: { color: '#4B5563' },
+                grid: { color: 'rgba(0,0,0,0.05)' }
+                },
+                y: {
+                ticks: { color: '#4B5563' },
+                grid: { color: 'rgba(0,0,0,0.05)' }
+                }
             }
-          }
+            }
         });
-    }
+        }
+
         const chartTypeSelect = document.getElementById('chart_type');
         chartTypeSelect.value = 'bar';
         renderChart('bar');

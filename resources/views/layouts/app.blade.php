@@ -4,56 +4,53 @@
       class="h-full">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <title>{{ config('app.name', 'Tracer Alumni') }}</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
 
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link rel="preconnect" href="https://fonts.bunny.net" />
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
       rel="stylesheet"
     />
-    <link
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-  rel="stylesheet"
-/>
 
-    
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased bg-gray-100 dark:bg-gray-900">
+<body class="font-sans antialiased bg-white text-gray-900">
     <div class="min-h-screen flex relative">
+
+        <!-- Navbar (Include this part to call the navigation) -->
+        @include('layouts.navigation')  <!-- Menambahkan Navbar dari resources/views/layouts/navigation.blade.php -->
 
         <!-- Sidebar Desktop -->
         <aside
             :class="sidebarCollapsed ? 'w-20' : 'w-64'"
-            class="fixed inset-y-0 left-0 z-40 hidden lg:flex flex-col transition-all duration-300 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700">
+            class="fixed inset-y-0 left-0 z-40 hidden lg:flex flex-col transition-all duration-300 bg-white border-r border-gray-200">
             @include('components.admin-sidebar')
         </aside>
 
         <!-- Sidebar Mobile -->
         <div x-show="sidebarOpen" x-cloak class="fixed inset-0 z-50 flex lg:hidden">
             <!-- Backdrop -->
-            <div @click="sidebarOpen = false" class="fixed inset-0 bg-black bg-opacity-50"></div>
+            <div @click="sidebarOpen = false" class="fixed inset-0 bg-black bg-opacity-25"></div>
 
             <!-- Sidebar Panel -->
-            <aside class="relative flex flex-col w-64 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700">
+            <aside class="relative flex flex-col w-64 h-full bg-white border-r border-gray-200">
                 @include('components.admin-sidebar')
             </aside>
         </div>
 
         <!-- Main Content -->
-        <div :class="sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'" class="flex-1 flex flex-col transition-all duration-300">
+        <div :class="sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'" class="flex-1 flex flex-col transition-all duration-300 pt-14">
+
             <main class="flex-1 p-6">
                 @isset($header)
                     <div class="mb-6">
-                        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $header }}</h1>
+                        <h1 class="text-2xl font-bold text-gray-900">{{ $header }}</h1>
                     </div>
                 @endisset
 
@@ -67,11 +64,14 @@
             </main>
 
             <!-- Footer -->
-            <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 text-sm text-center py-4 text-gray-500 dark:text-gray-400">
+            <footer class="bg-white border-t border-gray-200 text-sm text-center py-4 text-gray-500">
                 &copy; {{ date('Y') }} Tracer Alumni. Dibuat dengan ❤️ oleh Tim Dewa Frontend.
             </footer>
         </div>
     </div>
+
+    {{-- Memanggil file JS --}}
+    @stack('scripts')
 </body>
 
 </html>
