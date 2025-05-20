@@ -42,88 +42,81 @@ class AnswerController extends Controller
     }
 
 
-public function showAnswers()
+    public function showAnswers()
 {
     $keyword = request('keyword');
-    $withQuestions = !empty($keyword);    
+    $withQuestions = !empty($keyword);
 
-    $questions = $withQuestions
-    ? Question::where('question_text', 'like', '%' . $keyword . '%')->get()
-    : Question::all(); 
+    $questionIds = [];
+    $questions = collect();
 
-    $query = AlumniAnswer::with('question', 'submission.alumni');
     if ($withQuestions) {
-        $query->whereHas('question', function ($q) use ($keyword) {
-            $q->where('question_text', 'like', '%' . $keyword . '%');
+        $questions = Question::where('question_text', 'like', '%' . $keyword . '%')->get();
+        $questionIds = $questions->pluck('id')->toArray();
+    } else {
+        $questions = Question::all();
+    }
+
+    $submissionQuery = Submission::with(['alumni', 'alumniAnswers.question']);
+
+    if ($withQuestions && count($questionIds) > 0) {
+        $submissionQuery->whereHas('alumniAnswers', function ($q) use ($questionIds) {
+            $q->whereIn('question_id', $questionIds)
+              ->whereNotNull('answer')
+              ->where('answer', '!=', '');
         });
     }
 
     if ($startDate = request('start_date')) {
-        $query->whereHas('submission', function ($q) use ($startDate) {
-            $q->whereDate('created_at', $startDate);
-        });
+        $submissionQuery->whereDate('created_at', $startDate);
     }
 
     if (($graduationYear = request('graduation_year')) && $graduationYear !== 'all') {
-        $query->whereHas('submission.alumni', function ($q) use ($graduationYear) {
+        $submissionQuery->whereHas('alumni', function ($q) use ($graduationYear) {
             $q->where('graduation_year', $graduationYear);
         });
     }
 
     if (($status = request('status')) && $status !== 'all') {
-        $query->whereHas('submission.alumni', function ($q) use ($status) {
+        $submissionQuery->whereHas('alumni', function ($q) use ($status) {
             $q->where('employment_status', $status);
         });
     }
 
-    $answers = $query->get();
+    $submissions = $submissionQuery->paginate(10)->withQueryString();
 
-    $groupedBySubmission = $answers->groupBy('submission_id');
+    // Susun data jawaban per alumni
     $alumniRows = [];
 
-
-    foreach ($groupedBySubmission as $submissionId => $answersGroup) {
+    foreach ($submissions as $submission) {
         $row = [
-            'submission_id' => $submissionId,
-            'created_at' => optional($answersGroup->first()->submission)->created_at,
-            'alumni' => optional($answersGroup->first()->submission->alumni),
+            'submission_id' => $submission->id,
+            'created_at' => $submission->created_at,
+            'alumni' => $submission->alumni,
         ];
-        
-        if ($withQuestions) {
-            foreach ($questions as $q) {
-                $row[$q->question_text] = '-';
-            }
-        
-            $answeredSomething = false;
-            foreach ($answersGroup as $answer) {
-                $row[$answer->question->question_text] = $answer->answer;
-                // jawaban ga kosong dan bukancuma spasi kosong
-                if ($answer->answer !== null && trim($answer->answer) !== '') {
-                    $answeredSomething = true;
-                }
-            }
-            if (!$answeredSomething) {
-                continue;
-            }
+
+        foreach ($questions as $q) {
+            $row[$q->question_text] = '-';
         }
-         else {
-            foreach ($answersGroup as $answer) {
-                $row[$answer->question->question_text] = $answer->answer;
-            }
+
+        foreach ($submission->alumniAnswers as $answer) {
+            $row[$answer->question->question_text] = $answer->answer;
         }
-    
+
         $alumniRows[] = $row;
     }
+
     $graduationYears = Alumni::pluck('graduation_year')->unique()->sort()->values();
     $employmentStatuses = Alumni::pluck('employment_status')->unique()->sort()->values();
 
-    return view('admin.alumni_answers.index', compact(
-        'questions',
-        'alumniRows',
-        'graduationYears',
-        'employmentStatuses',
-        'withQuestions' 
-    ));
+    return view('admin.alumni_answers.index', [
+        'questions' => $questions,
+        'submissions' => $submissions,
+        'alumniRows' => $alumniRows,
+        'graduationYears' => $graduationYears,
+        'employmentStatuses' => $employmentStatuses,
+        'withQuestions' => $withQuestions,
+    ]);
 }
 
 

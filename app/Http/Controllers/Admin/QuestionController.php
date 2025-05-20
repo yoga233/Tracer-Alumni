@@ -17,7 +17,8 @@ class QuestionController extends Controller
             ->when($search, function($query) use ($search) {
                 return $query->where('question_text', 'like', '%' . $search . '%');
             })
-            ->paginate(10);
+            ->paginate(10)
+            ->appends(['search' => $search]); // <- ini penting
 
         return view('admin.questions.index', compact('questions'));
     }
