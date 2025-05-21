@@ -197,99 +197,103 @@
                 </div>
 
                 {{-- Table --}}
-                <div class="overflow-auto bg-white shadow-xl rounded-xl border border-gray-200 dark:border-gray-700">
-                    <div class="w-full overflow-x-auto rounded-xl shadow-md border border-gray-200">
-                        <table class="min-w-max divide-y divide-gray-200 text-sm text-left text-gray-700 table-auto" id="dataTable">
-                            <thead class="bg-blue-100 text-blue-900 font-semibold uppercase text-xs tracking-wider">
-                                <tr>
-                                    <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300">ID</th>
-                                    <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300">Nama</th>
-                                    <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300">Email</th>
-                                    <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300">Jurusan</th>
-                                    <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300">Tahun Lulus</th>
+                
+                <div class="w-full overflow-x-auto rounded-xl shadow-md">
+                    <table class="min-w-max divide-y divide-gray-200 text-sm text-left text-gray-700 table-auto" id="dataTable">
+                        <thead class="bg-blue-100 text-blue-900 font-semibold uppercase text-xs tracking-wider">
+                            <tr>
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap">ID</th>
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Nama</th>
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Email</th>
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Jurusan</th>
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Tahun Lulus</th>
+
+                                @foreach ($questions->take(4) as $question)
+                                    <th data-question @if ($withQuestions) data-question-matched @endif class="px-4 py-3 font-semibold whitespace-nowrap">
+                                        {{ $question->question_text }}
+                                    </th>
+                                @endforeach
+
+                                @foreach ($questions->skip(4) as $question)
+                                    <th class="px-4 py-3 font-semibold whitespace-nowrap hidden">
+                                        {{ $question->question_text }}
+                                    </th>
+                                @endforeach
+
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Waktu Isi</th>
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Lainnya</th>
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Aksi</th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="divide-y divide-gray-200 bg-white" id="dataRows">
+                            @foreach ($alumniRows as $index => $row)
+                                <tr class="hover:bg-gray-100 text-left">
+                                    <td class="px-4 py-2 whitespace-nowrap">{{ ($submissions->currentPage() - 1) * $submissions->perPage() + $index + 1 }}</td>
+                                    <td class="px-4 py-2 whitespace-nowrap">{{ $row['alumni']->name ?? '-' }}</td>
+                                    <td class="px-4 py-2 whitespace-nowrap">{{ $row['alumni']->email ?? '-' }}</td>
+                                    <td class="px-4 py-2 whitespace-nowrap">{{ $row['alumni']->major ?? '-' }}</td>
+                                    <td class="px-4 py-2 whitespace-nowrap">{{ $row['alumni']->graduation_year ?? '-' }}</td>
 
                                     @foreach ($questions->take(4) as $question)
-                                        <th data-question @if ($withQuestions) data-question-matched @endif class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300">
-                                            {{ $question->question_text }}
-                                        </th>
+                                        <td data-question @if ($withQuestions) data-question-matched @endif class="px-4 py-2 whitespace-nowrap">
+                                            {{ $row[$question->question_text] ?? '-' }}
+                                        </td>
                                     @endforeach
 
                                     @foreach ($questions->skip(4) as $question)
-                                        <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 hidden">
-                                            {{ $question->question_text }}
-                                        </th>
+                                        <td class="px-4 py-2 whitespace-nowrap hidden">
+                                            {{ $row[$question->question_text] ?? '-' }}
+                                        </td>
                                     @endforeach
 
-                                    <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300">Waktu Isi</th>
-                                    <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300">Lainnya</th>
-                                    <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300">Aksi</th>
-                                </tr>
-                            </thead>
+                                    <td class="px-4 py-2 whitespace-nowrap">
+                                        {{ optional($row['created_at'])->format('d M Y, H:i') ?? '-' }}
+                                    </td>
 
-                            <tbody class="divide-y divide-gray-200 bg-white" id="dataRows">
-                                @foreach ($alumniRows as $index => $row)
-                                    <tr class="hover:bg-gray-100 text-left">
-                                        <td class="px-4 py-2 whitespace-nowrap border border-gray-300">{{ ($submissions->currentPage() - 1) * $submissions->perPage() + $index + 1 }}</td>
-                                        <td class="px-4 py-2 whitespace-nowrap border border-gray-300">{{ $row['alumni']->name ?? '-' }}</td>
-                                        <td class="px-4 py-2 whitespace-nowrap border border-gray-300">{{ $row['alumni']->email ?? '-' }}</td>
-                                        <td class="px-4 py-2 whitespace-nowrap border border-gray-300">{{ $row['alumni']->major ?? '-' }}</td>
-                                        <td class="px-4 py-2 whitespace-nowrap border border-gray-300">{{ $row['alumni']->graduation_year ?? '-' }}</td>
+                                    <td class="px-4 py-2 whitespace-nowrap">
+                                        <button 
+                                            class="inline-flex items-center px-4 py-2 bg-blue-500 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition duration-200"
+                                            onclick="loadDetails({{ $row['submission_id'] }})"
+                                        >
+                                            Details
+                                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </button>
+                                    </td>
 
-                                        @foreach ($questions->take(4) as $question)
-                                            <td data-question @if ($withQuestions) data-question-matched @endif class="px-4 py-2 whitespace-nowrap border border-gray-300">
-                                                {{ $row[$question->question_text] ?? '-' }}
-                                            </td>
-                                        @endforeach
-
-                                        @foreach ($questions->skip(4) as $question)
-                                            <td class="px-4 py-2 whitespace-nowrap border border-gray-300 hidden">
-                                                {{ $row[$question->question_text] ?? '-' }}
-                                            </td>
-                                        @endforeach
-
-                                        <td class="px-4 py-2 whitespace-nowrap border border-gray-300">
-                                            {{ optional($row['created_at'])->format('d M Y, H:i') ?? '-' }}
-                                        </td>
-
-                                        <td class="px-4 py-2 whitespace-nowrap border border-gray-300">
-                                            <button class="text-blue-600 hover:underline" onclick="loadDetails({{ $row['submission_id'] }})">
-                                                Lihat Selengkapnya
+                                    <td class="px-4 py-2 whitespace-nowrap">
+                                        <form action="{{ route('admin.alumni_answers.destroy', $row['submission_id']) }}" method="POST"
+                                            onsubmit="return confirm('Yakin ingin menghapus data alumni ini beserta jawabannya?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                class="inline-flex items-center px-3 py-2 bg-red-500 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 transition-all duration-200">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M19 7L5 7M10 11V17M14 11V17M5 7L6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19L19 7M9 7V4H15V7" />
+                                                </svg>
+                                                Hapus
                                             </button>
-                                        </td>
-
-                                        <td class="px-4 py-2 whitespace-nowrap border border-gray-300">
-                                            <form action="{{ route('admin.alumni_answers.destroy', $row['submission_id']) }}" method="POST"
-                                                onsubmit="return confirm('Yakin ingin menghapus data alumni ini beserta jawabannya?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:scale-125 hover:underline transition-all duration-150">
-                                                    Hapus
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-
-                
-                    <!-- no notification -->
-                    <div id="noResults" class="hidden p-4 text-red-600 bg-red-100 rounded-md">
-                        Data tidak ditemukan untuk pencarian Anda.
-                    </div>
-                    <!-- pagination (Jika diperlukan) -->
-                    <div class="p-4">  
-                        {{-- {{ $alumniRows->links() }} --}}
-                    </div>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
                 
+                <!-- no notification -->
+                <div id="noResults" class="hidden p-4 text-red-600 bg-red-100 rounded-md">
+                    Data tidak ditemukan untuk pencarian Anda.
+                </div>
+                <div class="mt-6 flex justify-center">
+                    {{ $submissions->links('components.pagination-question') }}
+                </div>
             </div>
         </div>
-    </div>
-
-    <div class="mt-6 flex justify-center">
-        {{ $submissions->links('components.pagination-question') }}
     </div>
 
 

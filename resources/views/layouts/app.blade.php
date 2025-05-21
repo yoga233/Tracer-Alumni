@@ -33,16 +33,8 @@
             @include('components.admin-sidebar')
         </aside>
 
-        <!-- Sidebar Mobile -->
-        <div x-show="sidebarOpen" x-cloak class="fixed inset-0 z-50 flex lg:hidden">
-            <!-- Backdrop -->
-            <div @click="sidebarOpen = false" class="fixed inset-0 bg-black bg-opacity-25"></div>
-
-            <!-- Sidebar Panel -->
-            <aside class="relative flex flex-col w-64 h-full bg-white border-r border-gray-200">
-                @include('components.admin-sidebar')
-            </aside>
-        </div>
+        <!-- Sidebar Mobile Fixed Bottom -->
+        @include('components.admin-sidebar-mobile')
 
         <!-- Main Content -->
         <div :class="sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'" class="flex-1 flex flex-col transition-all duration-300 pt-14">
