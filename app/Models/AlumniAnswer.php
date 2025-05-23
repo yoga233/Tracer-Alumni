@@ -16,12 +16,15 @@ class AlumniAnswer extends Model
         'question_id',
         'answer',
     ];
-    
+        
 
     // Relasi ke model Question (Jika diperlukan)
     public function question()
     {
         return $this->belongsTo(Question::class);
+    }
+    public function submission(){
+        return $this->belongsTo(Submission::class);
     }
     
 }

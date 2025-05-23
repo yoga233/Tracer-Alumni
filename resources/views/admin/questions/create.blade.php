@@ -1,117 +1,168 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">
-            Tambah Pertanyaan Baru
-        </h2>
+        <div class="mb-6 flex items-start gap-4 animate-fade-in">
+            <div class="border-l-4 border-blue-600 pl-4">
+                <h2 class="text-3xl font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fas fa-plus-circle text-blue-600"></i>
+                    Tambah Pertanyaan Baru
+                </h2>
+                <p class="text-sm text-gray-600 mt-1">
+                    Masukkan detail pertanyaan baru untuk digunakan dalam survei atau kuesioner.
+                </p>
+            </div>
+        </div>
     </x-slot>
 
-    <div class="py-6">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg p-6">
-
-                <!-- Form untuk menambahkan pertanyaan -->
-                <form action="{{ route('admin.questions.store') }}" method="POST">
+    <div class="py-12 bg-gray-50 min-h-screen text-gray-800">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <form action="{{ route('admin.questions.store') }}" method="POST" class="space-y-8">
                     @csrf
-                    <div class="space-y-6">
 
-                        <!-- Pertanyaan -->
+                    <!-- Pertanyaan -->
+                    <div>
+                        <label for="question_text" class="block text-sm font-medium text-gray-700">Pertanyaan</label>
+                        <input type="text" name="question_text" id="question_text" value="{{ old('question_text') }}" required
+                            class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400">
+                        @error('question_text')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Tipe Pertanyaan -->
+                    <div>
+                        <label for="question_type_id" class="block text-sm font-medium text-gray-700">Tipe Pertanyaan</label>
+                        <select name="question_type_id" id="question_type_id" required
+                            class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white">
+                            <option value="">Pilih Tipe</option>
+                            @foreach ($questionTypes as $type)
+                                <option value="{{ $type->id }}" {{ old('question_type_id') == $type->id ? 'selected' : '' }}>
+                                    {{ $type->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('question_type_id')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Opsi Jawaban -->
+                    <div id="options-container" class="hidden">
+                        <label class="block text-sm font-medium text-gray-700">Opsi Jawaban</label>
+                        <div id="options-list" class="space-y-2 mt-2">
+                            <div class="flex items-center gap-2">
+                                <input type="text" name="options[]"
+                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
+                                    placeholder="Opsi 1">
+                                <button type="button" class="text-red-600 hover:text-red-800 remove-option" title="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" id="add-option"
+                            class="mt-3 text-sm text-blue-600 hover:underline">+ Tambah opsi</button>
+                    </div>
+
+                    <!-- Opsi Lainnya -->
+                    <div id="other-option" class="hidden flex items-center gap-2">
+                        <input type="checkbox" name="other_option_enabled" id="other_option_enabled"
+                            class="form-checkbox text-blue-600" {{ old('other_option_enabled') ? 'checked' : '' }}>
+                        <label for="other_option_enabled" class="text-sm text-gray-700">Sertakan opsi "Lainnya"</label>
+                    </div>
+
+                    <!-- Skala -->
+                    <div id="scale-container" class="hidden">
+                        <label for="scale_range" class="block text-sm font-medium text-gray-700">Skala (misalnya: 1-5)</label>
+                        <input type="text" name="scale_range" id="scale_range" value="{{ old('scale_range') }}"
+                            class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
+                            placeholder="Contoh: 1-5">
+                        <p class="text-sm text-gray-500 mt-1">Gunakan format rentang, contoh: 1-10</p>
+                    </div>
+
+                    <!-- Matriks -->
+                    <div id="matrix-container" class="hidden space-y-6">
                         <div>
-                            <label for="question_text" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Pertanyaan</label>
-                            <input type="text" id="question_text" name="question_text" value="{{ old('question_text') }}" required
-                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
-                            @error('question_text') 
-                                <p class="mt-2 text-sm text-red-500">{{ $message }}</p>
-                            @enderror
+                            <label class="block text-sm font-medium text-gray-700">Kolom</label>
+                            <div id="matrix-columns" class="space-y-2 mt-2">
+                                <div class="flex items-center gap-2">
+                                    <input type="text" name="matrix_columns[]"
+                                        class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
+                                        placeholder="Kolom 1">
+                                    <button type="button" class="text-red-600 hover:text-red-800 remove-column" title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <button type="button" id="add-column"
+                                class="mt-2 text-sm text-blue-600 hover:underline">+ Tambah Kolom</button>
                         </div>
 
-                        <!-- Tipe Pertanyaan -->
                         <div>
-                            <label for="question_type_id" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Tipe Pertanyaan</label>
-                            <select id="question_type_id" name="question_type_id" required
-                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
-                                <option value="">Pilih Tipe</option>
-                                @foreach ($questionTypes as $type)
-                                    <option value="{{ $type->id }}" {{ old('question_type_id') == $type->id ? 'selected' : '' }}>
-                                        {{ $type->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('question_type_id') 
-                                <p class="mt-2 text-sm text-red-500">{{ $message }}</p>
-                            @enderror
+                            <label class="block text-sm font-medium text-gray-700">Baris</label>
+                            <div id="matrix-rows" class="space-y-2 mt-2">
+                                <div class="flex items-center gap-2">
+                                    <input type="text" name="matrix_rows[]"
+                                        class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
+                                        placeholder="Baris 1">
+                                    <button type="button" class="text-red-600 hover:text-red-800 remove-row" title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <button type="button" id="add-row"
+                                class="mt-2 text-sm text-blue-600 hover:underline">+ Tambah Baris</button>
                         </div>
+                    </div>
 
-                        <!-- Opsi (untuk radio, checkbox, select) -->
-                        <div id="options-container" class="hidden">
-                            <label for="options" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Opsi Jawaban (pisahkan dengan koma)</label>
-                            <textarea id="options" name="options" rows="3"
-                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">{{ old('options') }}</textarea>
+                    <!-- Status Kerja -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Status Kerja</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
+                            @foreach ($employmentStatuses as $status)
+                                <label class="flex items-center gap-2 text-sm text-gray-800">
+                                    <input type="checkbox" name="employment_conditions[]" value="{{ $status }}"
+                                        class="text-blue-600 rounded"
+                                        {{ is_array(old('employment_conditions')) && in_array($status, old('employment_conditions')) ? 'checked' : '' }}>
+                                    {{ ucfirst($status) }}
+                                </label>
+                            @endforeach
                         </div>
-
-                        <!-- Skala (untuk scale) -->
-                        <div id="scale-container" class="hidden">
-                            <label for="scale_range" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Rentang Skala (contoh: 1-5)</label>
-                            <input type="text" name="scale_range" id="scale_range"
-                                value="{{ old('scale_range') }}"
-                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
-                                placeholder="Contoh: 1-5">
+                        <div class="flex gap-3 mt-3">
+                            <button type="button" id="select-all"
+                                class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition">Pilih Semua</button>
+                            <button type="button" id="reset-all"
+                                class="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition">Reset</button>
                         </div>
+                        @error('employment_conditions')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                        <!-- Matrix (untuk matrix) -->
-                        <div id="matrix-container" class="hidden">
-                            <label for="matrix_rows" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Baris Matrix (pisahkan dengan koma)</label>
-                            <textarea name="matrix_rows" id="matrix_rows" rows="2"
-                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">{{ old('matrix_rows') }}</textarea>
-
-                            <label for="matrix_columns" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mt-4">Kolom Matrix (pisahkan dengan koma)</label>
-                            <textarea name="matrix_columns" id="matrix_columns" rows="2"
-                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">{{ old('matrix_columns') }}</textarea>
+                    <!-- Wajib Diisi -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Wajib Diisi?</label>
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" name="is_required" id="is_required" value="1"
+                                class="form-checkbox text-blue-600" {{ old('is_required') ? 'checked' : '' }}>
+                            <label for="is_required" class="text-sm text-gray-700">Ya</label>
                         </div>
+                    </div>
 
-                        <!-- Label Skala (untuk scale) -->
-                        <div id="scale-labels-container" class="hidden mt-4">
-                            <label for="scale_labels" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Label Skala (Pisahkan dengan koma)</label>
-                            <textarea id="scale_labels" name="scale_labels" rows="2"
-                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">{{ old('scale_labels') }}</textarea>
-                        </div>
-
-                        <!-- Tombol Submit -->
-                        <div class="flex justify-end">
-                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow-md">
-                                Simpan Pertanyaan
-                            </button>
-                        </div>
+                    <!-- Submit -->
+                    <div class="flex justify-end pt-6">
+                        <button type="submit"
+                            class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg shadow-md transition hover:scale-[1.02]">
+                            Simpan Pertanyaan
+                        </button>
                     </div>
                 </form>
 
+                
             </div>
         </div>
     </div>
 
-    <!-- Script untuk toggle input berdasarkan tipe pertanyaan -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const typeSelect = document.getElementById('question_type_id');
-            const optionsContainer = document.getElementById('options-container');
-            const scaleContainer = document.getElementById('scale-container');
-            const matrixContainer = document.getElementById('matrix-container');
-            const scaleLabelsContainer = document.getElementById('scale-labels-container');
-
-            const showOptions = ['radio', 'checkbox', 'select'];
-            const showScale = ['scale'];
-            const showMatrix = ['matrix'];
-
-            function toggleFields() {
-                const selected = typeSelect.options[typeSelect.selectedIndex]?.text.toLowerCase() || '';
-
-                optionsContainer.classList.toggle('hidden', !showOptions.includes(selected));
-                scaleContainer.classList.toggle('hidden', !showScale.includes(selected));
-                matrixContainer.classList.toggle('hidden', !showMatrix.includes(selected));
-                scaleLabelsContainer.classList.toggle('hidden', selected !== 'scale');
-            }
-
-            toggleFields(); // jalankan saat load
-            typeSelect.addEventListener('change', toggleFields);
-        });
-    </script>
+    @push('scripts')
+        @vite('resources/js/pages/question-form.js')
+    @endpush
 </x-app-layout>

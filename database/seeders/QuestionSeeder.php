@@ -2,125 +2,99 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Question;
+use App\Models\QuestionType;
+use Illuminate\Database\Seeder;
 
 class QuestionSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
     public function run()
     {
+        $questionTypes = QuestionType::all();
+
         $questions = [
-            // Pertanyaan umum dengan tipe input
-            ['question_text' => 'Tahun Lulus', 'question_type_id' => 1],
-            ['question_text' => 'Nomor Pokok Mahasiswa (NPM)', 'question_type_id' => 1],
-            ['question_text' => 'Nama Mahasiswa', 'question_type_id' => 1],
-            ['question_text' => 'NIK / Nomor KTP', 'question_type_id' => 1],
-            ['question_text' => 'Tanggal Lahir', 'question_type_id' => 1],
-            ['question_text' => 'Alamat Email', 'question_type_id' => 1],
-            ['question_text' => 'Nomor Telepon / HP', 'question_type_id' => 1],
-            ['question_text' => 'NPWP', 'question_type_id' => 1],
-            ['question_text' => 'Nama Dosen Pembimbing (tulis tanpa gelar)', 'question_type_id' => 1],
-
-            // Pertanyaan dengan opsi pilihan
             [
-                'question_text' => 'Sebutkan sumber dana dalam pembiayaan kuliah saat kuliah di ITATS?',
-                'question_type_id' => 3,
-                'options' => json_encode([
-                    "Biaya Sendiri / Keluarga",
-                    "Beasiswa ADIK",
-                    "Beasiswa BIDIK MISI",
-                    "Beasiswa PPA",
-                    "Beasiswa AFIRMASI",
-                    "Beasiswa Perusahaan/Swasta",
-                    "Yang lain"
-                ])
+                'question_text' => 'What is your name?',
+                'question_type_id' => $questionTypes->where('name', 'text')->first()->id,
+                'is_required' => true,
             ],
-
             [
-                'question_text' => 'Jelaskan status Anda saat ini?',
-                'question_type_id' => 3,
-                'options' => json_encode([
-                    "Bekerja (full time/part time)",
-                    "Belum memungkinkan bekerja",
-                    "Wiraswasta",
-                    "Melanjutkan Pendidikan",
-                    "Tidak Kerja Tetapi sedang mencari kerja"
-                ])
+                'question_text' => 'Describe your experience with our service.',
+                'question_type_id' => $questionTypes->where('name', 'textarea')->first()->id,
+                'is_required' => false,
             ],
-
             [
-                'question_text' => 'Apakah Anda aktif mencari pekerjaan dalam 6 bulan terakhir?',
-                'question_type_id' => 3,
-                'options' => json_encode([
-                    "Ya",
-                    "Tidak"
-                ])
+                'question_text' => 'What is your favorite color?',
+                'question_type_id' => $questionTypes->where('name', 'radio')->first()->id,
+                'is_required' => true,
             ],
-
             [
-                'question_text' => 'Jika saat ini Anda tidak bekerja, apa alasan utamanya?',
-                'question_type_id' => 3,
-                'options' => json_encode([
-                    "Masih menunggu hasil lamaran kerja",
-                    "Melanjutkan pendidikan",
-                    "Mengurus keluarga",
-                    "Belum siap bekerja",
-                    "Lainnya"
-                ])
+                'question_text' => 'Select your favorite hobbies.',
+                'question_type_id' => $questionTypes->where('name', 'checkbox')->first()->id,
+                'is_required' => false,
             ],
-
             [
-                'question_text' => 'Berapa rata-rata pendapatan Anda per bulan saat ini?',
-                'question_type_id' => 3,
-                'options' => json_encode([
-                    "< Rp 1.000.000",
-                    "Rp 1.000.000 - Rp 3.000.000",
-                    "Rp 3.000.000 - Rp 5.000.000",
-                    "Rp 5.000.000 - Rp 10.000.000",
-                    "> Rp 10.000.000"
-                ])
+                'question_text' => 'What is your gender?',
+                'question_type_id' => $questionTypes->where('name', 'select')->first()->id,
+                'is_required' => true,
             ],
-
-            // Pertanyaan dengan input teks panjang
             [
-                'question_text' => 'Apa jenis pekerjaan Anda saat ini?',
-                'question_type_id' => 2
+                'question_text' => 'How often do you use our product?',
+                'question_type_id' => $questionTypes->where('name', 'radio')->first()->id,
+                'is_required' => true,
             ],
-
             [
-                'question_text' => 'Apa nama perusahaan tempat Anda bekerja sekarang?',
-                'question_type_id' => 1
+                'question_text' => 'Any additional feedback?',
+                'question_type_id' => $questionTypes->where('name', 'textarea')->first()->id,
+                'is_required' => false,
             ],
-
             [
-                'question_text' => 'Apakah pekerjaan Anda sesuai dengan bidang studi Anda?',
-                'question_type_id' => 3,
-                'options' => json_encode([
-                    "Sangat Sesuai",
-                    "Sesuai",
-                    "Tidak Sesuai"
-                ])
+                'question_text' => 'What is your birth year?',
+                'question_type_id' => $questionTypes->where('name', 'text')->first()->id,
+                'is_required' => false,
             ],
-
             [
-                'question_text' => 'Berapa lama waktu yang Anda butuhkan untuk mendapatkan pekerjaan pertama setelah lulus?',
-                'question_type_id' => 3,
-                'options' => json_encode([
-                    "< 3 bulan",
-                    "3 - 6 bulan",
-                    "6 - 12 bulan",
-                    "> 12 bulan",
-                    "Belum bekerja"
-                ])
+                'question_text' => 'Select all devices you own.',
+                'question_type_id' => $questionTypes->where('name', 'checkbox')->first()->id,
+                'is_required' => false,
             ],
-
             [
-                'question_text' => 'Saran dan masukan untuk peningkatan kualitas pembelajaran di ITATS:',
-                'question_type_id' => 2
+                'question_text' => 'Which country are you from?',
+                'question_type_id' => $questionTypes->where('name', 'select')->first()->id,
+                'is_required' => true,
+            ],
+            [
+                'question_text' => 'What time do you usually wake up?',
+                'question_type_id' => $questionTypes->where('name', 'text')->first()->id,
+                'is_required' => false,
+            ],
+            [
+                'question_text' => 'How satisfied are you with our support?',
+                'question_type_id' => $questionTypes->where('name', 'radio')->first()->id,
+                'is_required' => true,
+            ],
+            [
+                'question_text' => 'Any suggestions for improvement?',
+                'question_type_id' => $questionTypes->where('name', 'textarea')->first()->id,
+                'is_required' => false,
+            ],
+            [
+                'question_text' => 'Select your favorite cuisines.',
+                'question_type_id' => $questionTypes->where('name', 'checkbox')->first()->id,
+                'is_required' => false,
+            ],
+            [
+                'question_text' => 'Which department do you belong to?',
+                'question_type_id' => $questionTypes->where('name', 'select')->first()->id,
+                'is_required' => true,
             ],
         ];
 
-        // Menyimpan data ke dalam database
         foreach ($questions as $question) {
             Question::create($question);
         }

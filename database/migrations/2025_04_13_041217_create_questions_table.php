@@ -15,13 +15,10 @@ return new class extends Migration
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
             $table->text('question_text');
-            $table->foreignId('question_type_id')
-                ->constrained('question_types')
-                ->onDelete('cascade');
-
-            
-            $table->json('options')->nullable();
-            $table->json('scale_labels')->nullable();
+            $table->foreignId('question_type_id')->constrained('question_types')->onDelete('cascade');
+            $table->boolean('is_required');            
+            // $table->json('options')->nullable(); 
+            // $table->json('scale_labels')->nullable();
 
             $table->timestamps();
         });
