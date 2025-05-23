@@ -1,17 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="mb-6 flex items-start gap-4 animate-fade-in">
-            <div class="border-l-4 border-blue-600 pl-4">
-                <h2 class="text-3xl font-bold text-gray-800 flex items-center gap-2">
-                    <i class="fas fa-users text-blue-600"></i>
-                    Jawaban Alumni
-                </h2>
-                <p class="text-sm text-gray-600 mt-1">
-                    Tinjau data hasil pengisian survei alumni yang mencakup identitas, status, dan tanggapan mereka terhadap pertanyaan yang diberikan.
-                </p>
-            </div>
-        </div>
-
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">
+            Jawaban Alumni (Tampilan Tabel)
+        </h2>
         <style>
             .custom-scrollbar::-webkit-scrollbar {
                 width: 8px;
@@ -29,10 +20,10 @@
 
     <div class="flex">
         <!-- Sidebar Filter -->
-        <div id="filterSidebar" class="fixed inset-y-0 right-0 w-80 bg-white text-gray-900 shadow-lg transform translate-x-full transition-transform duration-300 z-50 overflow-y-auto">
+        <div id="filterSidebar" class="fixed inset-y-0 right-0 w-80 bg-gray-900 text-gray-100 shadow-lg transform translate-x-full transition-transform duration-300 z-50 overflow-y-auto">
             <div class="p-6">
                 <div class="flex items-center justify-between mb-4 border-b border-gray-600 pb-2">
-                    <h3 class="text-lg font-semibold text-black">Filter</h3>
+                    <h3 class="text-lg font-semibold text-white">Filter</h3>
                     
                     <button 
                       type="button"
@@ -54,56 +45,44 @@
                 
 
                 {{-- Form Filter --}}
-                <form method="GET" action="{{ route('admin.alumni-answers.index') }}" class="mb-6 space-y-5">
+                <form method="GET" action="{{ route('admin.alumni-answers.index') }}" class="mb-6 space-y-4">
 
-                    {{-- Pencarian Keyword Pertanyaan --}}
+                    {{-- pencarian keyword pertanyaan --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Keyword Pertanyaan</label>
-                        <input
-                            type="text"
-                            id="filterKeyword"
-                            name="keyword"
-                            value="{{ request('keyword') }}"
-                            placeholder="Cari pertanyaan..."
-                            class="w-full px-4 py-2 rounded-lg border border-gray-300 shadow-sm text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                        >
+                        <label class="block text-sm font-medium text-white">Keyword Pertanyaan</label>
+                        <input type="text" id="filterKeyword" name="keyword" value="{{ request('keyword') }}"
+                            class="w-full p-2 border border-gray-700 rounded-md bg-gray-800 text-white placeholder-gray-400"
+                            placeholder="Cari pertanyaan...">
+                    </div>
+                
+                    {{-- pengisian --}}
+                    <div class="flex space-x-2">
+                        <div class="w-1/2">
+                            <label class="block text-sm font-medium text-white">Waktu Pengisian</label>
+                            <input type="date" name="start_date" value="{{ request('start_date') }}"
+                                class="w-full p-2 border border-gray-700 rounded-md bg-gray-800 text-white">
+                        </div>
                     </div>
 
-                    {{-- Waktu Pengisian --}}
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Waktu Pengisian</label>
-                        <input
-                            type="date"
-                            name="start_date"
-                            value="{{ request('start_date') }}"
-                            class="w-full px-4 py-2 rounded-lg border border-gray-300 shadow-sm text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                        >
+                    {{-- tahun lulus --}}
+                    <div class="flex space-x-2">
+                        <div class="w-1/2">
+                            <label class="block text-sm font-medium text-white">Tahun Lulus</label>
+                            <select name="graduation_year" class="w-full p-2 border border-gray-700 rounded-md bg-gray-800 text-white">
+                                <option value="all">Semua</option>
+                                @foreach ($graduationYears as $year)
+                                    <option value="{{ $year }}" {{ request('graduation_year') == $year ? 'selected' : '' }}>
+                                        {{ $year }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
-
-                    {{-- Tahun Lulus --}}
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tahun Lulus</label>
-                        <select
-                            name="graduation_year"
-                            class="w-full px-4 py-2 rounded-lg border border-gray-300 shadow-sm text-gray-800 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                        >
-                            <option value="all">Semua</option>
-                            @foreach ($graduationYears as $year)
-                                <option value="{{ $year }}" {{ request('graduation_year') == $year ? 'selected' : '' }}>
-                                    {{ $year }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    {{-- Status Pekerjaan --}}
-                    <div>
-                        <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status Pekerjaan</label>
-                        <select
-                            name="status"
-                            id="status"
-                            class="w-full px-4 py-2 rounded-lg border border-gray-300 shadow-sm text-gray-800 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                        >
+                
+                    {{-- filter status --}}
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-white" for="status">Status Pekerjaan</label>
+                        <select class="w-full p-2 border border-gray-700 rounded-md bg-gray-800 text-white" name="status" id="status">
                             <option value="all">Semua</option>
                             @foreach ($employmentStatuses as $status)
                                 <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
@@ -112,31 +91,33 @@
                             @endforeach
                         </select>
                     </div>
-
-                    {{-- Tombol Aksi --}}
-                    <div class="flex justify-between pt-2">
-                        <button
-                            type="submit"
-                            class="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition"
-                        >
-                            Filter
-                        </button>
-
-                        <button
-                            type="button"
-                            onclick="resetFilter()"
-                            class="px-6 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold transition"
-                        >
-                            Reset
-                        </button>
-
+                
+                    <div class="flex space-x-32">
+                        <div>
+                            <button type="submit"
+                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-all duration-150">
+                                Filter
+                            </button>
+                        </div>
+    
+                        <div>
+                            <button type="button" onclick="resetFilter()"
+                                class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-all duration-150">
+                                Reset
+                            </button>
+                        </div>                    
                     </div>
 
                 </form>
 
-
                 
                 <hr class="my-4 border-gray-700">                
+
+                {{-- //gambarlogo --}}
+
+                <div class="mt-4">
+                    <img src="{{ asset('../assets/logo.png') }}" alt="Logo" class="w-48 h-40 mx-auto border border-gray-700">
+                </div>
 
             </div>
         </div>
@@ -146,25 +127,25 @@
         <!-- Main Content -->
         <div class="py-10 flex-1">
             <!-- Modal Detail Redesain dengan Animasi Transisi -->
-         <div id="detailModal" class="fixed inset-0 z-50 bg-black bg-opacity-60 items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 ease-in-out hidden">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl p-8 relative overflow-hidden max-h-[90vh] border border-gray-300 dark:border-gray-700">
+         <div id="detailModal" class="fixed inset-0 z-50 bg-black bg-opacity-60 backdrop-blur-sm items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 ease-in-out hidden">
+            <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-4xl p-8 relative overflow-hidden max-h-[90vh] border border-gray-300 dark:border-gray-700">
                 <!-- Header -->
-                <div class="flex justify-between items-start mb-6 border-b pb-4 border-gray-200">
+                <div class="flex justify-between items-start mb-6 border-b pb-4 border-gray-200 dark:border-gray-700">
                     <div>
-                        <h3 class="text-2xl font-bold text-gray-900">📋 Detail Jawaban Alumni</h3>
-                        <p class="text-sm text-gray-500">Data lengkap yang diisi oleh alumni</p>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white">📋 Detail Jawaban Alumni</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Data lengkap yang diisi oleh alumni</p>
                     </div>
                     <button onclick="closeModal()" class="text-gray-400 hover:text-red-500 transition text-4xl font-bold">&times;</button>
                 </div>
 
                 <!-- Content -->
-                <div id="modalContent" class="space-y-3 text-sm text-gray-800 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                <div id="modalContent" class="space-y-3 text-sm text-gray-800 dark:text-gray-200 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                     <!-- Diisi via JS -->
                 </div>
 
                 <!-- Footer -->
-                <div class="mt-6 pt-4 border-t border-gray-200 text-right">
-                    <button onclick="closeModal()" class="px-5 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition">Tutup</button>
+                <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 text-right">
+                    <button onclick="closeModal()" class="px-5 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition">Tutup</button>
                 </div>
             </div>
         </div>
@@ -177,15 +158,14 @@
                         <input
                             type="text"
                             id="tableSearchInput"
-                            class="w-full py-3 pl-11 pr-4 bg-white border border-gray-300 rounded-lg shadow-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            class="w-full p-3 pl-10 pr-4 border border-gray-700 rounded-md bg-gray-800 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                             placeholder="Cari jawaban alumni..."
                             onkeyup="searchTable()"
                         >
-                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5a7 7 0 11-7 7 7 7 0 017-7zM21 21l-4.35-4.35" />
                         </svg>
                     </div>
-
 
                     <!-- Filter Button (on the right) -->
                     <button onclick="toggleFilter()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center space-x-2">
@@ -197,110 +177,93 @@
                 </div>
 
                 {{-- Table --}}
-                
-                <div class="w-full overflow-x-auto rounded-xl shadow-md">
-                    <table class="min-w-max divide-y divide-gray-200 text-sm text-left text-gray-700 table-auto" id="dataTable">
-                        <thead class="bg-blue-100 text-blue-900 font-semibold uppercase text-xs tracking-wider">
-                            <tr>
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap">ID</th>
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Nama</th>
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Email</th>
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Jurusan</th>
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Tahun <br> Lulus</th>
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Status Kerja</th>
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Waktu tunggu kerja <br> setelah lulus</th>
+                <div class="overflow-auto bg-white dark:bg-gray-900 shadow-xl rounded-xl border border-gray-200 dark:border-gray-700">
+                    
+                    <table class="min-w-full table-auto text-sm text-left text-gray-700 dark:text-gray-200" id="dataTable">
+                    <thead class="bg-gray-100 dark:bg-gray-800 border-b dark:border-gray-600">
+                        <tr>
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">ID</th>
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Nama</th>
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Email</th>
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Jurusan</th>
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Tahun Lulus</th>
+                            {{-- <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Status kerja</th> --}}
+                            @foreach ($questions->take(4) as $question)
+                                <th data-question  @if ($withQuestions) data-question-matched @endif
+                                class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">
 
-
-                                @foreach ($questions->take(4) as $question)
-                                    <th data-question @if ($withQuestions) data-question-matched @endif class="px-4 py-3 font-semibold whitespace-nowrap">
-                                        {{ $question->question_text }}
-                                    </th>
-                                @endforeach
-
-                                @foreach ($questions->skip(4) as $question)
-                                    <th class="px-4 py-3 font-semibold whitespace-nowrap hidden">
-                                        {{ $question->question_text }}
-                                    </th>
-                                @endforeach
-
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Waktu Isi</th>
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Lainnya</th>
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Aksi</th>
-                            </tr>
-                        </thead>
-
-                        <tbody class="divide-y divide-gray-200 bg-white" id="dataRows">
-                            @foreach ($alumniRows as $index => $row)
-                                <tr class="hover:bg-gray-100 text-left">
-                                    <td class="px-4 py-2 whitespace-nowrap">{{ ($submissions->currentPage() - 1) * $submissions->perPage() + $index + 1 }}</td>
-                                    <td class="px-4 py-2 whitespace-nowrap">{{ $row['alumni']->name ?? '-' }}</td>
-                                    <td class="px-4 py-2 whitespace-nowrap">{{ $row['alumni']->email ?? '-' }}</td>
-                                    <td class="px-4 py-2 whitespace-nowrap">{{ $row['alumni']->major ?? '-' }}</td>
-                                    <td class="px-4 py-2 whitespace-nowrap">{{ $row['alumni']->graduation_year ?? '-' }}</td>
-                                    <td class="px-4 py-2 whitespace-nowrap">{{ $row['alumni']->employment_status ?? '-' }}</td>                          
-                                    <td class="px-4 py-2 whitespace-nowrap">{{ $row['alumni']->mounth_waiting ?? '-' }}</td>
-
-                                    @foreach ($questions->take(4) as $question)
-                                        <td data-question @if ($withQuestions) data-question-matched @endif class="px-4 py-2 whitespace-nowrap">
-                                            {{ $row[$question->question_text] ?? '-' }}
-                                        </td>
-                                    @endforeach
-
-                                    @foreach ($questions->skip(4) as $question)
-                                        <td class="px-4 py-2 whitespace-nowrap hidden">
-                                            {{ $row[$question->question_text] ?? '-' }}
-                                        </td>
-                                    @endforeach
-
-                                    <td class="px-4 py-2 whitespace-nowrap">
-                                        {{ \Carbon\Carbon::parse($row['created_at'])->translatedFormat('j F Y, H:i') ?? '-' }}
-                                    </td>
-
-                                    <td class="px-4 py-2 whitespace-nowrap">
-                                        <button 
-                                            class="inline-flex items-center px-4 py-2 bg-blue-500 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition duration-200"
-                                            onclick="loadDetails({{ $row['submission_id'] }})"
-                                        >
-                                            Details
-                                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/>
-                                            </svg>
-                                        </button>
-                                    </td>
-
-                                    <td class="px-4 py-2 whitespace-nowrap">
-                                        <form action="{{ route('admin.alumni_answers.destroy', $row['submission_id']) }}" method="POST"
-                                            onsubmit="return confirm('Yakin ingin menghapus data alumni ini beserta jawabannya?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                class="inline-flex items-center px-3 py-2 bg-red-500 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 transition-all duration-200">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"
-                                                    xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        d="M19 7L5 7M10 11V17M14 11V17M5 7L6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19L19 7M9 7V4H15V7" />
-                                                </svg>
-                                                Hapus
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
+                                    {{ $question->question_text }}
+                                    
+                                </th>
                             @endforeach
-                        </tbody>
-                    </table>
+                            <!-- Kolom lainnya yang disembunyikan -->
+                            @foreach ($questions->skip(4) as $question)
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600 hidden">
+                                    {{ $question->question_text }}
+                                </th>
+                            @endforeach
+                            
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Waktu Isi</th>
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Lainnya</th>
+                            <th class="px-4 py-3 font-semibold whitespace-nowrap border border-gray-300 dark:border-gray-600">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-center" id="dataRows">
+                        @foreach ($alumniRows as $index => $row)
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $index + 1 }}</td>
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $row['alumni']->name ?? '-' }}</td>
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $row['alumni']->email ?? '-' }}</td>
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $row['alumni']->major ?? '-' }}</td>
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">{{ $row['alumni']->graduation_year ?? '-' }}</td>
+                              
+                                @foreach ($questions->take(4) as $question)
+                                    <td data-question @if ($withQuestions)  data-question-matched @endif  
+                                    class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">
+                                    
+                                        {{ $row[$question->question_text] ?? '-' }}
+                                    
+                                    </td>
+                                @endforeach
+                                @foreach ($questions->skip(4) as $question)
+                                    <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600 hidden">
+                                        {{ $row[$question->question_text] ?? '-' }}
+                                    </td>
+                                @endforeach
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">
+                                    {{ optional($row['created_at'])->format('d M Y, H:i') ?? '-' }}
+                                </td>
+                                {{-- untuk melihat detailnya --}}
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">
+                                     <button class="text-blue-600 hover:underline" onclick="loadDetails({{ $row['submission_id'] }})">Lihat Selengkapnya</button>
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap border border-gray-300 dark:border-gray-600">
+                                    <form action="{{ route('admin.alumni_answers.destroy', $row['submission_id']) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus data alumni ini beserta jawabannya?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:scale-125 hover:underline transition-all duration-150">
+                                            Hapus
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                
+                    <!-- no notification -->
+                    <div id="noResults" class="hidden p-4 text-red-600 bg-red-100 rounded-md">
+                        Data tidak ditemukan untuk pencarian Anda.
+                    </div>
+                    <!-- pagination (Jika diperlukan) -->
+                    <div class="p-4">  
+                        {{-- {{ $alumniRows->links() }} --}}
+                    </div>
                 </div>
                 
-                <!-- no notification -->
-                <div id="noResults" class="hidden p-4 text-red-600 bg-red-100 rounded-md">
-                    Data tidak ditemukan untuk pencarian Anda.
-                </div>
-                <div class="mt-6 flex justify-center">
-                    {{ $submissions->links('components.pagination-question') }}
-                </div>
             </div>
         </div>
     </div>
-
 
     <!-- Scroll Up Button -->
     <button id="scrollUpBtn" class="fixed bottom-4 right-4 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all transform scale-0 opacity-0" onclick="scrollToTop()">
@@ -323,23 +286,8 @@
         }
 
         // reset
-        function resetFilter() {
-            const form = document.querySelector('#filterSidebar form');
-
-            if (!form) return;
-
-            // Reset semua input dan select
-            const inputs = form.querySelectorAll('input, select');
-            inputs.forEach(input => {
-                if (input.tagName === 'INPUT' && (input.type === 'text' || input.type === 'date')) {
-                    input.value = '';
-                } else if (input.tagName === 'SELECT') {
-                    input.selectedIndex = 0; // default ke opsi pertama (biasanya 'Semua')
-                }
-            });
-
-            form.submit();
-            document.body.style.opacity = 0.6;
+        function resetFilter(){
+            window.location.href = "{{ route('admin.alumni-answers.index') }}";
         }
 
         // menyembunyikan filter
@@ -376,9 +324,6 @@
             major: 'Jurusan',
             graduation_year: 'Angkatan',
             employment_status: 'Status Pekerjaan',
-            mounth_waiting: 'Setelah lulus menunggu kerja berapa bulan',
-            type_company: 'Tipe Perusahaan',
-            closeness_workfield: 'Jarak kerja',
             phone_number: 'Nomor Telepon',
             address: 'Alamat'
         };

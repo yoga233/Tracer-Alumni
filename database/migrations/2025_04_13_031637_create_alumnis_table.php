@@ -19,10 +19,7 @@ return new class extends Migration
             $table->string('email')->unique(); 
             $table->string('major');
             $table->year('graduation_year');  
-            $table->enum('employment_status', ['Bekerja', 'Belum Bekerja','Wirausaha','Freelance','Studi Lanjut'])->default('Belum Bekerja');
-            $table->enum('mounth_waiting',['<= 3 bulan','<= 6 bulan','<= 9 bulan','<= 12 bulan'])->nullable();
-            $table->enum('type_company', ['Lokal','Nasional','Internasional'])->nullable();
-            $table->enum('closeness_workfield', ['Sangat erat','Erat','Cukup erat','Tidak erat'])->nullable();
+            $table->enum('employment_status', ['Employed', 'Unemployed', 'Freelancer', 'Entrepreneur', 'Studying'])->default('Unemployed');
             $table->string('phone_number')->nullable();  
             $table->string('address')->nullable(); 
             $table->timestamps();

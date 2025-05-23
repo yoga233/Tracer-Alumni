@@ -11,25 +11,25 @@ use Illuminate\Http\Request;
 class AnswerController extends Controller
 {
     
-    // public function create(Question $question)
-    // {
-    //     return view('admin.answers.create', compact('question'));
-    // }
+    public function create(Question $question)
+    {
+        return view('admin.answers.create', compact('question'));
+    }
 
-    // public function store(Request $request, Question $question)
-    // {
-    //     $validated = $request->validate([
-    //         'answer_text' => 'required|string',
-    //     ]);
+    public function store(Request $request, Question $question)
+    {
+        $validated = $request->validate([
+            'answer_text' => 'required|string',
+        ]);
 
-    //     AlumniAnswer::create([
-    //         'question_id' => $question->id,
-    //         'answer_text' => $validated['answer_text'],
-    //     ]);
+        AlumniAnswer::create([
+            'question_id' => $question->id,
+            'answer_text' => $validated['answer_text'],
+        ]);
 
-    //     return redirect()->route('admin.answers.index', $question)
-    //                      ->with('success', 'Jawaban berhasil ditambahkan!');
-    // }
+        return redirect()->route('admin.answers.index', $question)
+                         ->with('success', 'Jawaban berhasil ditambahkan!');
+    }
 
     public function destroyBySubmission($submissionId)
     {
@@ -42,81 +42,88 @@ class AnswerController extends Controller
     }
 
 
-    public function showAnswers()
+public function showAnswers()
 {
     $keyword = request('keyword');
-    $withQuestions = !empty($keyword);
+    $withQuestions = !empty($keyword);    
 
-    $questionIds = [];
-    $questions = collect();
+    $questions = $withQuestions
+    ? Question::where('question_text', 'like', '%' . $keyword . '%')->get()
+    : Question::all(); 
 
+    $query = AlumniAnswer::with('question', 'submission.alumni');
     if ($withQuestions) {
-        $questions = Question::where('question_text', 'like', '%' . $keyword . '%')->get();
-        $questionIds = $questions->pluck('id')->toArray();
-    } else {
-        $questions = Question::all();
-    }
-
-    $submissionQuery = Submission::with(['alumni', 'alumniAnswers.question']);
-
-    if ($withQuestions && count($questionIds) > 0) {
-        $submissionQuery->whereHas('alumniAnswers', function ($q) use ($questionIds) {
-            $q->whereIn('question_id', $questionIds)
-              ->whereNotNull('answer')
-              ->where('answer', '!=', '');
+        $query->whereHas('question', function ($q) use ($keyword) {
+            $q->where('question_text', 'like', '%' . $keyword . '%');
         });
     }
 
     if ($startDate = request('start_date')) {
-        $submissionQuery->whereDate('created_at', $startDate);
+        $query->whereHas('submission', function ($q) use ($startDate) {
+            $q->whereDate('created_at', $startDate);
+        });
     }
 
     if (($graduationYear = request('graduation_year')) && $graduationYear !== 'all') {
-        $submissionQuery->whereHas('alumni', function ($q) use ($graduationYear) {
+        $query->whereHas('submission.alumni', function ($q) use ($graduationYear) {
             $q->where('graduation_year', $graduationYear);
         });
     }
 
     if (($status = request('status')) && $status !== 'all') {
-        $submissionQuery->whereHas('alumni', function ($q) use ($status) {
+        $query->whereHas('submission.alumni', function ($q) use ($status) {
             $q->where('employment_status', $status);
         });
     }
 
-    $submissions = $submissionQuery->paginate(10)->withQueryString();
+    $answers = $query->get();
 
-    //nyusundata jawaban per alumni
+    $groupedBySubmission = $answers->groupBy('submission_id');
     $alumniRows = [];
 
-    foreach ($submissions as $submission) {
+
+    foreach ($groupedBySubmission as $submissionId => $answersGroup) {
         $row = [
-            'submission_id' => $submission->id,
-            'created_at' => $submission->created_at,
-            'alumni' => $submission->alumni,
+            'submission_id' => $submissionId,
+            'created_at' => optional($answersGroup->first()->submission)->created_at,
+            'alumni' => optional($answersGroup->first()->submission->alumni),
         ];
-
-        foreach ($questions as $q) {
-            $row[$q->question_text] = '-';
+        
+        if ($withQuestions) {
+            foreach ($questions as $q) {
+                $row[$q->question_text] = '-';
+            }
+        
+            $answeredSomething = false;
+            foreach ($answersGroup as $answer) {
+                $row[$answer->question->question_text] = $answer->answer;
+                // jawaban ga kosong dan bukancuma spasi kosong
+                if ($answer->answer !== null && trim($answer->answer) !== '') {
+                    $answeredSomething = true;
+                }
+            }
+            if (!$answeredSomething) {
+                continue;
+            }
         }
-
-        foreach ($submission->alumniAnswers as $answer) {
-            $row[$answer->question->question_text] = $answer->answer;
+         else {
+            foreach ($answersGroup as $answer) {
+                $row[$answer->question->question_text] = $answer->answer;
+            }
         }
-
+    
         $alumniRows[] = $row;
     }
-
     $graduationYears = Alumni::pluck('graduation_year')->unique()->sort()->values();
     $employmentStatuses = Alumni::pluck('employment_status')->unique()->sort()->values();
 
-    return view('admin.alumni_answers.index', [
-        'questions' => $questions,
-        'submissions' => $submissions,
-        'alumniRows' => $alumniRows,
-        'graduationYears' => $graduationYears,
-        'employmentStatuses' => $employmentStatuses,
-        'withQuestions' => $withQuestions,
-    ]);
+    return view('admin.alumni_answers.index', compact(
+        'questions',
+        'alumniRows',
+        'graduationYears',
+        'employmentStatuses',
+        'withQuestions' 
+    ));
 }
 
 
@@ -135,13 +142,10 @@ public function detailJawaban($submissionId)
             'major' => $alumni->major,
             'graduation_year' => $alumni->graduation_year,
             'employment_status' => $alumni->employment_status,
-            'mounth_waiting' => $alumni->mounth_waiting,
-            'type_company' => $alumni->type_company,
-            'closeness_workfield' => $alumni->closeness_workfield,
             'phone_number' => $alumni->phone_number,
             'address' => $alumni->address
         ],
-        //mapp jawaban
+        // mapp jawaban
         'alumniAnswers' => $submission->alumniAnswers->map(function ($answer) {
             return [
                 'question' => $answer->question->question_text, 
