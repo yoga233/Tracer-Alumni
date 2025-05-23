@@ -215,3 +215,17 @@ document.addEventListener('DOMContentLoaded', function () {
     toggleOtherOption(); // Jalankan saat pertama load
 
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const selectAllBtn = document.getElementById('select-all');
+    const resetBtn = document.getElementById('reset-all');
+    const checkboxes = document.querySelectorAll('input[name="employment_conditions[]"]');
+
+    selectAllBtn.addEventListener('click', () => {
+        checkboxes.forEach(fullchecklist => fullchecklist.checked = true);
+    });
+
+    resetBtn.addEventListener('click', () => {
+        checkboxes.forEach(reset => reset.checked = false);
+    });
+});

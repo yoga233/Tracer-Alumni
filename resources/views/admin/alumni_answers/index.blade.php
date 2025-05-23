@@ -206,7 +206,10 @@
                                 <th class="px-4 py-3 font-semibold whitespace-nowrap">Nama</th>
                                 <th class="px-4 py-3 font-semibold whitespace-nowrap">Email</th>
                                 <th class="px-4 py-3 font-semibold whitespace-nowrap">Jurusan</th>
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Tahun Lulus</th>
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Tahun <br> Lulus</th>
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Status Kerja</th>
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Waktu tunggu kerja <br> setelah lulus</th>
+
 
                                 @foreach ($questions->take(4) as $question)
                                     <th data-question @if ($withQuestions) data-question-matched @endif class="px-4 py-3 font-semibold whitespace-nowrap">
@@ -234,6 +237,8 @@
                                     <td class="px-4 py-2 whitespace-nowrap">{{ $row['alumni']->email ?? '-' }}</td>
                                     <td class="px-4 py-2 whitespace-nowrap">{{ $row['alumni']->major ?? '-' }}</td>
                                     <td class="px-4 py-2 whitespace-nowrap">{{ $row['alumni']->graduation_year ?? '-' }}</td>
+                                    <td class="px-4 py-2 whitespace-nowrap">{{ $row['alumni']->employment_status ?? '-' }}</td>                          
+                                    <td class="px-4 py-2 whitespace-nowrap">{{ $row['alumni']->mounth_waiting ?? '-' }}</td>
 
                                     @foreach ($questions->take(4) as $question)
                                         <td data-question @if ($withQuestions) data-question-matched @endif class="px-4 py-2 whitespace-nowrap">
@@ -248,7 +253,7 @@
                                     @endforeach
 
                                     <td class="px-4 py-2 whitespace-nowrap">
-                                        {{ optional($row['created_at'])->format('d M Y, H:i') ?? '-' }}
+                                        {{ \Carbon\Carbon::parse($row['created_at'])->translatedFormat('j F Y, H:i') ?? '-' }}
                                     </td>
 
                                     <td class="px-4 py-2 whitespace-nowrap">
@@ -371,6 +376,9 @@
             major: 'Jurusan',
             graduation_year: 'Angkatan',
             employment_status: 'Status Pekerjaan',
+            mounth_waiting: 'Setelah lulus menunggu kerja berapa bulan',
+            type_company: 'Tipe Perusahaan',
+            closeness_workfield: 'Jarak kerja',
             phone_number: 'Nomor Telepon',
             address: 'Alamat'
         };

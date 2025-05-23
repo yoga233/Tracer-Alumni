@@ -1,4 +1,5 @@
-<div class="relative flex flex-col justify-between h-full w-full p-4 bg-gradient-to-b from-blue-800 via-blue-700 to-blue-900 text-white shadow-xl">
+<div
+    class="relative flex flex-col justify-between h-full w-full p-4 bg-gradient-to-b from-blue-600 via-blue-700 to-blue-900 text-white shadow-xl">
     <!-- Toggle Button -->
     <div class="absolute top-1/2 -right-4 transform -translate-y-1/2 z-20">
         <button @click="sidebarCollapsed = !sidebarCollapsed"
@@ -10,7 +11,8 @@
     <!-- Header -->
     <div class="flex justify-center mb-6">
         <template x-if="sidebarCollapsed">
-            <div class="flex items-center justify-center w-10 h-10 bg-white text-blue-900 font-bold text-sm rounded-full shadow-md">
+            <div
+                class="flex items-center justify-center w-10 h-10 bg-white text-blue-900 font-bold text-sm rounded-full shadow-md">
                 TI
             </div>
         </template>
@@ -25,7 +27,7 @@
 
     <!-- Menu -->
     <nav class="flex-1 space-y-2 text-sm font-medium">
-        
+
         <!-- GRUP: UTAMA -->
         <div class="text-xs text-white/70 uppercase tracking-wide mb-1 px-3" x-show="!sidebarCollapsed">Utama</div>
 
@@ -38,7 +40,8 @@
 
         <!-- GRUP: KUESIONER -->
         <div class="h-px bg-white/30 mb-4"></div><br>
-        <div class="text-xs text-white/70 uppercase tracking-wide mt-4 mb-1 px-3" x-show="!sidebarCollapsed">Kuesioner</div>
+        <div class="text-xs text-white/70 uppercase tracking-wide mt-4 mb-1 px-3" x-show="!sidebarCollapsed">Kuesioner
+        </div>
 
         <a href="{{ route('admin.questions.index') }}"
             class="relative group flex p-3 rounded-md hover:bg-blue-400/20 transition-all items-center"
@@ -63,7 +66,8 @@
 
         <!-- GRUP: ANALISIS -->
         <div class="h-px bg-white/30 mb-4"></div><br>
-        <div class="text-xs text-white/70 uppercase tracking-wide mt-4 mb-1 px-3" x-show="!sidebarCollapsed">Analisis</div>
+        <div class="text-xs text-white/70 uppercase tracking-wide mt-4 mb-1 px-3" x-show="!sidebarCollapsed">Analisis
+        </div>
 
         <a href="{{ route('admin.reports.showReport') }}"
             class="relative group flex p-3 rounded-md hover:bg-blue-400/20 transition-all items-center"
@@ -74,7 +78,8 @@
 
         <!-- GRUP: PENGATURAN -->
         <div class="h-px bg-white/30 mb-4"></div><br>
-        <div class="text-xs text-white/70 uppercase tracking-wide mt-4 mb-1 px-3" x-show="!sidebarCollapsed">Pengaturan</div>
+        <div class="text-xs text-white/70 uppercase tracking-wide mt-4 mb-1 px-3" x-show="!sidebarCollapsed">Pengaturan
+        </div>
 
         <a href="{{ route('profile.edit') }}"
             class="relative group flex p-3 rounded-md hover:bg-blue-400/20 transition-all items-center"

@@ -16,26 +16,43 @@
   <div class="py-8 bg-gray-50 min-h-screen text-gray-800">
     <div class="max-w-7xl mx-auto px-4">
       <div class="bg-white shadow rounded-xl p-6">
+          <div class="flex flex-col gap-4 md:flex-row md:justify-between md:items-center mb-6">
 
-      <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
-          
-        {{-- Form pencarian --}}
-        <form method="GET" action="{{ route('admin.questions.index') }}" class="w-full md:w-auto">
-          <div class="flex items-center gap-2">
-            <input type="text" name="search" value="{{ request('search') }}"
-              placeholder="Cari pertanyaan..." 
-              class="w-full md:w-64 px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300">
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-              Cari
-            </button>
+            {{-- Form Pencarian + Filter --}}
+            <form method="GET" action="{{ route('admin.questions.index') }}" class="w-full md:flex-1">
+              <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                <input type="text" name="search" value="{{ request('search') }}"
+                  placeholder="Cari pertanyaan..."
+                  class="w-full sm:flex-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                <select name="employment_status"
+                  class="w-full sm:flex-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                  <option value="">Semua Kategori Kerja</option>
+                  @foreach($employmentStatuses as $status)
+                    <option value="{{ $status }}" {{ request('employment_status') == $status ? 'selected' : '' }}>
+                      {{ ucfirst($status) }}
+                    </option>
+                  @endforeach
+                </select>
+                <button type="submit"
+                  class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-md">
+                  Filter
+                </button>
+                <a href="{{ route('admin.questions.index') }}"
+                  class="px-5 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition shadow-md">
+                  Reset
+                </a>
+              </div>
+            </form>
+
+            {{-- Tombol Tambah Pertanyaan --}}
+            <div class="flex justify-end">
+              <a href="{{ route('admin.questions.create') }}"
+                class="inline-block bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg shadow transition-all whitespace-nowrap">
+                + Tambah Pertanyaan
+              </a>
+            </div>
           </div>
-        </form>
 
-        {{-- Tombol Tambah --}}
-        <a href="{{ route('admin.questions.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition-all whitespace-nowrap">
-          + Tambah Pertanyaan
-        </a>
-      </div>
 
 
         @if (session('success'))
@@ -52,6 +69,7 @@
                 <th class="px-6 py-3">Pertanyaan</th>
                 <th class="px-6 py-3">Tipe</th>
                 <th class="px-6 py-3">Wajib</th>
+                <th class="px-6 py-3">Kategori Kerja</th>
                 <th class="px-6 py-3 text-center">Aksi</th>
               </tr>
             </thead>
@@ -70,6 +88,15 @@
                     <span class="inline-block px-2 py-1 rounded-full text-xs font-medium {{ $question->is_required ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
                       {{ $question->is_required ? 'Ya' : 'Tidak' }}
                     </span>
+                  </td>
+                  <td class="px-6 py-4">
+                    @foreach ($question->questionConditions as $condition)
+                      @if($condition->field === 'employment_status')
+                        <span class="inline-block bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs mr-1 mb-1">
+                          {{ ucfirst($condition->value_status_kerja) }}
+                        </span>
+                      @endif
+                    @endforeach
                   </td>
                   <td class="px-6 py-4 text-center space-x-2">
                     <a href="{{ route('admin.questions.edit', $question->id) }}"

@@ -11,25 +11,25 @@ use Illuminate\Http\Request;
 class AnswerController extends Controller
 {
     
-    public function create(Question $question)
-    {
-        return view('admin.answers.create', compact('question'));
-    }
+    // public function create(Question $question)
+    // {
+    //     return view('admin.answers.create', compact('question'));
+    // }
 
-    public function store(Request $request, Question $question)
-    {
-        $validated = $request->validate([
-            'answer_text' => 'required|string',
-        ]);
+    // public function store(Request $request, Question $question)
+    // {
+    //     $validated = $request->validate([
+    //         'answer_text' => 'required|string',
+    //     ]);
 
-        AlumniAnswer::create([
-            'question_id' => $question->id,
-            'answer_text' => $validated['answer_text'],
-        ]);
+    //     AlumniAnswer::create([
+    //         'question_id' => $question->id,
+    //         'answer_text' => $validated['answer_text'],
+    //     ]);
 
-        return redirect()->route('admin.answers.index', $question)
-                         ->with('success', 'Jawaban berhasil ditambahkan!');
-    }
+    //     return redirect()->route('admin.answers.index', $question)
+    //                      ->with('success', 'Jawaban berhasil ditambahkan!');
+    // }
 
     public function destroyBySubmission($submissionId)
     {
@@ -85,7 +85,7 @@ class AnswerController extends Controller
 
     $submissions = $submissionQuery->paginate(10)->withQueryString();
 
-    // Susun data jawaban per alumni
+    //nyusundata jawaban per alumni
     $alumniRows = [];
 
     foreach ($submissions as $submission) {
@@ -135,10 +135,13 @@ public function detailJawaban($submissionId)
             'major' => $alumni->major,
             'graduation_year' => $alumni->graduation_year,
             'employment_status' => $alumni->employment_status,
+            'mounth_waiting' => $alumni->mounth_waiting,
+            'type_company' => $alumni->type_company,
+            'closeness_workfield' => $alumni->closeness_workfield,
             'phone_number' => $alumni->phone_number,
             'address' => $alumni->address
         ],
-        // mapp jawaban
+        //mapp jawaban
         'alumniAnswers' => $submission->alumniAnswers->map(function ($answer) {
             return [
                 'question' => $answer->question->question_text, 
