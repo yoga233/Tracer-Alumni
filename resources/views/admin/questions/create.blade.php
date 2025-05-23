@@ -162,7 +162,7 @@
         </div>
     </div>
 
-    @push('scripts')
+    {{-- @push('scripts')
         @vite('resources/js/pages/question-form.js')
-    @endpush
+    @endpush --}}
 </x-app-layout>
