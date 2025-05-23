@@ -46,40 +46,153 @@
 
                 <form action="{{ route('alumni.form.submit') }}" method="POST" class="space-y-6">
                     @csrf
-                    {{-- statis question alumni --}}
+                {{-- === Informasi Alumni === --}}
                     <div class="grid md:grid-cols-2 gap-6">
                         <div class="space-y-4">
                             <div>
-                                <label for="name" class="block font-bold text-lg">Nama <span class="text-red-600">*</span></label>
-                                <input type="text" id="name" name="name" required
-                                    class="form-input w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                <label for="name" class="block font-semibold text-sm text-gray-700">Nama <span class="text-red-600">*</span></label>
+                                <input type="text" id="name" name="name" value="{{ old('name') }}" required
+                                    class="w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:border-blue-500 px-3 py-2">
+                                @error('name') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                             </div>
-    
+
                             <div>
-                                <label for="email" class="block font-bold text-lg">Email <span class="text-red-600">*</span></label>
-                                <input type="email" id="email" name="email" required
-                                    class="form-input w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                <label for="email" class="block font-semibold text-sm text-gray-700">Email <span class="text-red-600">*</span></label>
+                                <input type="email" id="email" name="email" value="{{ old('email') }}" required
+                                    class="w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:border-blue-500 px-3 py-2">
+                                @error('email') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
-                    
 
                         <div class="space-y-4">
                             <div>
-                                <label for="major" class="block font-bold text-lg">Program Studi / Major <span class="text-red-600">*</span></label>
-                                <input type="text" id="major" name="major" required
-                                    class="form-input w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                <label for="major" class="block font-semibold text-sm text-gray-700">Program Studi / Major <span class="text-red-600">*</span></label>
+                                <input type="text" id="major" name="major" value="{{ old('major') }}" required
+                                    class="w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:border-blue-500 px-3 py-2">
+                                @error('major') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                             </div>
-    
+
                             <div>
-                                <label for="graduation_year" class="block font-bold text-lg">Tahun Lulus <span class="text-red-600">*</span></label>
-                                <input type="number" id="graduation_year" name="graduation_year" min="1900" max="2099" step="1" required
-                                    class="form-input w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                <label for="graduation_year" class="block font-semibold text-sm text-gray-700">Tahun Lulus <span class="text-red-600">*</span></label>
+                                <input type="number" id="graduation_year" name="graduation_year" min="1900" max="2099" step="1"
+                                    value="{{ old('graduation_year') }}" required
+                                    class="w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:border-blue-500 px-3 py-2">
+                                @error('graduation_year') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
                     </div>
 
-                    {{-- dinamis question --}}
+                    {{-- === Informasi Pekerjaan === --}}
+                    <div class="grid md:grid-cols-2 gap-6 mt-6">
+                        <div class="space-y-4">
+                            <div>
+                                <label for="employment_status" class="block font-semibold text-sm text-gray-700">Status Pekerjaan <span class="text-red-600">*</span></label>
+                                <select id="employment_status" name="employment_status" required
+                                        class="w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:border-blue-500 px-3 py-2">
+                                    <option value="" disabled {{ old('employment_status') ? '' : 'selected' }}>- Pilih Status -</option>
+                                    @foreach(['Belum Bekerja', 'Bekerja', 'Wirausaha', 'Freelance', 'Studi Lanjut'] as $status)
+                                        <option value="{{ $status }}" {{ old('employment_status') == $status ? 'selected' : '' }}>{{ $status }}</option>
+                                    @endforeach
+                                </select>
+                                @error('employment_status') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                            </div>
 
+                            <div>
+                                <label for="mounth_waiting" class="block font-semibold text-sm text-gray-700">Waktu Tunggu</label>
+                                <select id="mounth_waiting" name="mounth_waiting"
+                                        class="w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:border-blue-500 px-3 py-2">
+                                    <option value="" disabled {{ old('mounth_waiting') ? '' : 'selected' }}>- Pilih Waktu Tunggu -</option>
+                                    @foreach(['<= 3 bulan', '<= 6 bulan', '<= 9 bulan', '<= 12 bulan'] as $mw)
+                                        <option value="{{ $mw }}" {{ old('mounth_waiting') == $mw ? 'selected' : '' }}>{{ $mw }}</option>
+                                    @endforeach
+                                </select>
+                                @error('mounth_waiting') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                            </div>
+
+                            <div>
+                                <label for="type_company" class="block font-semibold text-sm text-gray-700">Jenis Perusahaan</label>
+                                <select id="type_company" name="type_company"
+                                        class="w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:border-blue-500 px-3 py-2">
+                                    <option value="" disabled {{ old('type_company') ? '' : 'selected' }}>- Pilih Jenis -</option>
+                                    @foreach(['Lokal', 'Nasional', 'Internasional'] as $tc)
+                                        <option value="{{ $tc }}" {{ old('type_company') == $tc ? 'selected' : '' }}>{{ $tc }}</option>
+                                    @endforeach
+                                </select>
+                                @error('type_company') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                            </div>
+
+                            <div>
+                                <label for="closeness_workfield" class="block font-semibold text-sm text-gray-700">Keterkaitan dengan Bidang Ilmu</label>
+                                <select id="closeness_workfield" name="closeness_workfield"
+                                        class="w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:border-blue-500 px-3 py-2">
+                                    <option value="" disabled {{ old('closeness_workfield') ? '' : 'selected' }}>- Pilih Tingkat Keterkaitan -</option>
+                                    @foreach(['Sangat erat', 'Erat', 'Cukup erat', 'Tidak erat'] as $cw)
+                                        <option value="{{ $cw }}" {{ old('closeness_workfield') == $cw ? 'selected' : '' }}>{{ $cw }}</option>
+                                    @endforeach
+                                </select>
+                                @error('closeness_workfield') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label for="phone_number" class="block font-semibold text-sm text-gray-700">Nomor Telepon</label>
+                                <input type="text" id="phone_number" name="phone_number" value="{{ old('phone_number') }}"
+                                    class="w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:border-blue-500 px-3 py-2">
+                                @error('phone_number') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                            </div>
+
+                            <div>
+                                <label for="address" class="block font-semibold text-sm text-gray-700">Alamat</label>
+                                <textarea id="address" name="address" rows="3"
+                                        class="w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:border-blue-500 px-3 py-2">{{ old('address') }}</textarea>
+                                @error('address') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- === Kompetensi Lulusan === --}}
+                    <div class="mt-8">
+                        <h3 class="text-lg font-bold mb-4">Kompetensi saat Lulus</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            @foreach($kompetensiFields as $field => $label)
+                                <div>
+                                    <label class="block font-semibold text-sm text-gray-700">{{ $label }}</label>
+                                    <select name="graduate_competency[{{ $field }}]" required
+                                            class="w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:border-blue-500 px-3 py-2">
+                                        <option value="" disabled {{ old("graduate_competency.$field") ? '' : 'selected' }}>-- Pilih --</option>
+                                        @foreach($kompetensiOptions as $opt)
+                                            <option value="{{ $opt }}" {{ old("graduate_competency.$field") == $opt ? 'selected' : '' }}>{{ $opt }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error("graduate_competency.$field") <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- === Kompetensi Kerja === --}}
+                    <div class="mt-8">
+                        <h3 class="text-lg font-bold mb-4">Kompetensi di Tempat Kerja</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            @foreach($kompetensiFields as $field => $label)
+                                <div>
+                                    <label class="block font-semibold text-sm text-gray-700">{{ $label }}</label>
+                                    <select name="work_competency[{{ $field }}]" required
+                                            class="w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:border-blue-500 px-3 py-2">
+                                        <option value="" disabled {{ old("work_competency.$field") ? '' : 'selected' }}>-- Pilih --</option>
+                                        @foreach($kompetensiOptions as $opt)
+                                            <option value="{{ $opt }}" {{ old("work_competency.$field") == $opt ? 'selected' : '' }}>{{ $opt }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error("work_competency.$field") <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+
+                    {{-- dinamis question --}}
                     @if (!empty($questions) && $questions->count())
                         @foreach ($questions as $index => $question)
                             <div class="space-y-1">
