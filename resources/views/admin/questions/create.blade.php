@@ -62,13 +62,14 @@
                         <button type="button" id="add-option"
                             class="mt-3 text-sm text-blue-600 hover:underline">+ Tambah opsi</button>
                     </div>
-
+                    
                     <!-- Opsi Lainnya -->
-                    <div id="other-option" class="hidden flex items-center gap-2">
-                        <input type="checkbox" name="other_option_enabled" id="other_option_enabled"
-                            class="form-checkbox text-blue-600" {{ old('other_option_enabled') ? 'checked' : '' }}>
-                        <label for="other_option_enabled" class="text-sm text-gray-700">Sertakan opsi "Lainnya"</label>
+                    <div id="other-option-container" class="hidden flex items-center gap-2">
+                        <input type="checkbox" name="other_option" id="other_option" value="1"
+                            class="form-checkbox text-blue-600" {{ old('other_option') ? 'checked' : '' }}>
+                        <label for="other_option" class="text-sm text-gray-700">Sertakan opsi "Lainnya"</label>
                     </div>
+
 
                     <!-- Skala -->
                     <div id="scale-container" class="hidden">

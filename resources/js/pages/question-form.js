@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initMatrix();
 
     const questionTypeSelect = document.getElementById('question_type_id');
-    const otherOption = document.getElementById('other-option');
+    const otherOption = document.getElementById('other-option-container');
 
     function toggleOtherOption() {
         const selectedType = questionTypeSelect.options[questionTypeSelect.selectedIndex].text.toLowerCase();
@@ -203,11 +203,6 @@ document.addEventListener('DOMContentLoaded', function () {
             otherOption.classList.remove('hidden');
         } else {
             otherOption.classList.add('hidden');
-            // Kalau opsi lainnya disembunyikan, reset checkboxnya juga supaya tidak tercentang
-            const otherCheckbox = otherOption.querySelector('input[type="checkbox"]');
-            if (otherCheckbox) {
-                otherCheckbox.checked = false;
-            }
         }
     }
 

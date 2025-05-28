@@ -59,6 +59,7 @@ class QuestionController extends Controller
             'question_type_id' => 'required|exists:question_types,id',
             'options' => 'nullable|array',
             'is_required' => 'nullable|boolean',
+            'other_option' => 'nullable|boolean',
             'scale_range' => 'nullable|string',
             'matrix_rows' => 'nullable|array', 
             'matrix_columns' => 'nullable|array',
@@ -95,6 +96,7 @@ class QuestionController extends Controller
             'question_type_id' => $validatedData['question_type_id'],
             'scale_labels' => !empty($scaleLabels) ? json_encode($scaleLabels) : null,
             'is_required' => $validatedData['is_required'] ?? false,
+            'other_option' => $validatedData['other_option'] ?? false,
         ]);
     if (in_array($typeName, ['radio', 'checkbox', 'select']) && !empty($options)) {
         foreach ($options as $optionText) {

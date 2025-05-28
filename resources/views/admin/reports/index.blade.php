@@ -122,7 +122,7 @@
                             </button>
 
                             <div x-show="open" @click.away="open = false"
-                                class="absolute z-30 mt-2 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-72 overflow-y-auto"
+                                class="relative z-30  w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-72 overflow-y-auto"
                                 style="display: none;">
 
                                 {{-- Search --}}

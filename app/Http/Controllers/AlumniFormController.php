@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Alumni;
+use App\Models\QuestionCondition;
 use App\Models\Option;
 use App\Models\Question;
 use App\Models\Submission;
@@ -31,39 +32,45 @@ class AlumniFormController extends Controller
         'Rendah',
     ];
 
-    public function showForm()
-    {
-        //buat submission_id jika belum ada
-        if (!session()->has('submission_id')) {
-            session(['submission_id' => (string) Str::uuid()]);
-        }
-        $questions = Question::with(['questiontype', 'options'])->get();
-
-        foreach ($questions as $question) {
-            if ($question->questiontype?->name === 'matrix') {
-                $rows = $columns = [];
-
-                foreach ($question->options as $option) {
-                    $parts = explode(' - ', $option->option_text);
-
-                    if (count($parts) === 2) {
-                        [$row, $column] = $parts;
-                        $rows[] = trim($row);
-                        $columns[] = trim($column);
-                    }
-                }
-
-                $question->rows = array_unique($rows);
-                $question->columns = array_unique($columns);
+   public function showForm(Request $request)
+        {
+            if (!session()->has('submission_id')) {
+                session(['submission_id' => (string) Str::uuid()]);
             }
+
+            // Ambil semua pertanyaan tanpa filter kondisi apapun
+            $questions = Question::with(['questiontype', 'options', 'questionConditions'])->get();
+
+            // Olah data matrix (jika ada)
+            foreach ($questions as $question) {
+                if ($question->questiontype?->name === 'matrix') {
+                    $rows = [];
+                    $columns = [];
+
+                    // Pisahkan baris dan kolom
+                    foreach ($question->options as $option) {
+                        $parts = explode(' - ', $option->option_text);
+                        if (count($parts) === 2) {
+                            [$row, $column] = $parts;
+                            $rows[] = trim($row);
+                            $columns[] = trim($column);
+                        }
+                    }
+
+                    $question->rows = array_unique($rows);
+                    $question->columns = array_unique($columns);
+                }
+            }
+
+            return view('alumni.form', [
+                'questions' => $questions,
+                'kompetensiFields' => $this->kompetensiFields,
+                'kompetensiOptions' => $this->kompetensiOptions,
+                'selectedStatus' => $request->query('employment_status') ?? null, // biar bisa dipakai di JS
+            ]);
         }
 
-        return view('alumni.form', [
-            'questions' => $questions,
-            'kompetensiFields' => $this->kompetensiFields,
-            'kompetensiOptions' => $this->kompetensiOptions,
-        ]);
-    }
+
 
     public function storeForm(Request $request)
     {
@@ -99,11 +106,34 @@ class AlumniFormController extends Controller
 
         // Simpan jawaban
         if (is_array($request->answers)) {
-            foreach ($request->answers as $questionId => $answer) {
+            $answers = $request->input('answers', []);
+            $answersOther = $request->input('answers_other', []);
+
+            foreach ($answers as $questionId => $answer) {
+                // Gabungkan jika sebelumnya checkbox atau select
+                $finalAnswer = is_array($answer) ? implode(', ', $answer) : $answer;
+
+                // Cek apakah ada jawaban 'lainnya' untuk pertanyaan ini
+                if (isset($answersOther[$questionId]) && !empty($answersOther[$questionId])) {
+                    $otherText = trim($answersOther[$questionId]);
+                    // Gabungkan jika sebelumnya checkbox atau select
+                    if (is_array($answer)) {
+                        $finalAnswer .= ', ' . $otherText;
+                    } else {
+                        // Ganti jika isinya memang 'lainnya'
+                        if ($finalAnswer === 'lainnya') {
+                            $finalAnswer = $otherText;
+                        } else {
+                            // Tambahkan koma jika jawaban sebelumnya bukan 'lainnya'
+                            $finalAnswer .= ', ' . $otherText;
+                        }
+                    }
+                }
+
                 AlumniAnswer::create([
                     'submission_id' => $submission->id,
                     'question_id' => $questionId,
-                    'answer' => is_array($answer) ? implode(', ', $answer) : $answer,
+                    'answer' => $finalAnswer,
                 ]);
             }
         }
@@ -115,8 +145,6 @@ class AlumniFormController extends Controller
             ['alumni_id' => $alumni->id],
             $request->input('work_competency')
         ));
-
-        // Bersihkan session UUID
         session()->forget('submission_id');
 
         return redirect()->route('alumni.form')->with('success', 'Formulir sudah disubmit bree!');

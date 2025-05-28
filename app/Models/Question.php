@@ -10,7 +10,7 @@ class Question extends Model
 {
 
     use HasFactory;
-    protected $fillable = ['question_text', 'question_type_id', 'is_required'];
+    protected $fillable = ['question_text', 'question_type_id', 'is_required', 'other_option'];
 
     // untuk dropdown kategory
     public const EMPLOYMENT_STATUSES = [
