@@ -164,7 +164,7 @@
 
                 <!-- Footer -->
                 <div class="mt-6 pt-4 border-t border-gray-200 text-right">
-                    <button onclick="closeModal()" class="px-5 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition">Tutup</button>
+                    <button onclick="closeModal()" class="px-5 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 transition">Tutup</button>
                 </div>
             </div>
         </div>
