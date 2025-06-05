@@ -156,10 +156,10 @@
 
       // RADAR
       createChart(document.getElementById('radarChart'), 'radar', {
-        labels: @json($majorChart->keys()),
+        labels: @json($graduationChart->keys()),
         datasets: [{
           label: 'Alumni per Jurusan',
-          data: @json($majorChart->values()),
+          data: @json($graduationChart->values()),
           borderColor: '#3B82F6',
           backgroundColor: 'rgba(59,130,246,0.2)',
           fill: true

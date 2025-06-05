@@ -8,7 +8,7 @@ use App\Models\Option;
 use App\Models\Question;
 use App\Models\Submission;
 use App\Models\AlumniAnswer;
-use App\Models\GraduateCompetencie;
+use App\Models\KompetensiLulus;
 use App\Models\WorkCompetencie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -16,20 +16,21 @@ use Illuminate\Support\Str;
 class AlumniFormController extends Controller
 {
     protected array $kompetensiFields = [
-        'ethics' => 'Etika',
-        'field_expertise' => 'Keahlian Bidang',
-        'english' => 'Bahasa Inggris',
-        'it_usage' => 'Pemanfaatan IT',
-        'communication' => 'Komunikasi',
-        'teamwork' => 'Kerjasama',
-        'self_development' => 'Pengembangan Diri',
+        'Etika' => 'Etika',
+        'Keahlian berdasarkan bidang ilmu' => 'Keahlian berdasarkan bidang ilmu',
+        'Bahasa Inggris' => 'Bahasa Inggris',
+        'Penggunaan Teknologi Informasi' => 'Penggunaan Teknologi Informasi',
+        'Komunikasi' => 'Komunikasi',
+        'Kerjasama tim' => 'Kerjasama tim',
+        'Pengembangan diri' => 'Pengembangan diri',
     ];
 
     protected array $kompetensiOptions = [
-        'Sangat Tinggi',
-        'Tinggi',
-        'Cukup',
+        'Sangat Rendah',
         'Rendah',
+        'Cukup',
+        'Tinggi',
+        'Sangat Tinggi',
     ];
 
    public function showForm(Request $request)
@@ -74,32 +75,42 @@ class AlumniFormController extends Controller
 
     public function storeForm(Request $request)
     {
-        // Validasi form umum + kompetensi
-        $validated = $request->validate(array_merge([
+        $rules = [
             'answers.*' => 'required',
-            'name' => 'required|string',
-            'email' => 'required|email',
-            'major' => 'required|string',
-            'graduation_year' => 'required|numeric',
-            'employment_status' => 'required|in:Bekerja,Belum Bekerja,Wirausaha,Freelance,Studi Lanjut',
-            'mounth_waiting' => 'nullable|in:<= 3 bulan,<= 6 bulan,<= 9 bulan,<= 12 bulan',
-            'type_company' => 'nullable|in:Lokal,Nasional,Internasional',
-            'closeness_workfield' => 'nullable|in:Sangat erat,Erat,Cukup erat,Tidak erat',
-            'phone_number' => 'nullable|string',
-            'address' => 'nullable|string',
-        ], $this->buildKompetensiValidation()));
+            'tahun_lulus' => 'required|digits:4|numeric',
+            'npm' => 'required|string|unique:alumnis,npm',
+            'nama_mahasiswa' => 'required|string',
+            'nik' => 'required|string|max:20|unique:alumnis,nik',
+            'tanggal_lahir' => 'required|date',
+            'email' => 'required|email|unique:alumnis,email',
+            'nomor_telepon' => 'nullable|string',
+            'npwp' => 'nullable|string',
+            'nama_dosen_pembimbing' => 'required|string',
+            'sumber_pembiayaan_kuliah' => 'nullable|string|max:255',
+            'sumber_lainnya' => 'required_if:sumber_pembiayaan_kuliah,Yang lain|string|max:255',
+            'status_saat_ini' => 'required|in:Bekerja (full time/part time),Belum Memungkinkan Bekerja,Tidak Kerja tetapi sedang mencari kerja,Wiraswasta,Melanjutkan Pendidikan',
+        ];
 
-        if (Alumni::where('email', $request->email)->exists()) {
-            return back()->withInput()->with('error', 'Email sudah pernah digunakan.');
+        $validated = $request->validate($rules);
+
+        $sumberPembiayaan = $request->input('sumber_pembiayaan_kuliah');
+        if ($sumberPembiayaan === 'Yang lain') {
+            $sumberPembiayaan = $request->input('sumber_lainnya');
         }
 
-        // Simpan data alumni
-        $alumni = Alumni::create($request->only([
-            'name', 'email', 'major', 'graduation_year',
-            'employment_status', 'mounth_waiting',
-            'type_company', 'closeness_workfield',
-            'phone_number', 'address'
-        ]));
+        $alumni = Alumni::create([
+            'tahun_lulus' => $request->tahun_lulus,
+            'npm' => $request->npm,
+            'nama_mahasiswa' => $request->nama_mahasiswa,
+            'nik' => $request->nik,
+            'tanggal_lahir' => $request->tanggal_lahir,
+            'email' => $request->email,
+            'nomor_telepon' => $request->nomor_telepon,
+            'npwp' => $request->npwp,
+            'nama_dosen_pembimbing' => $request->nama_dosen_pembimbing,
+            'status_saat_ini' => $request->status_saat_ini,
+            'sumber_pembiayaan_kuliah' => $sumberPembiayaan,
+        ]); 
 
         // Simpan submission
         $submission = Submission::create(['alumni_id' => $alumni->id]);
@@ -137,14 +148,14 @@ class AlumniFormController extends Controller
                 ]);
             }
         }
-        GraduateCompetencie::create(array_merge(
+        KompetensiLulus::create(array_merge(
             ['alumni_id' => $alumni->id],
-            $request->input('graduate_competency')
+            $request->input('kompetensi_lulus')
         ));
-        WorkCompetencie::create(array_merge(
-            ['alumni_id' => $alumni->id],
-            $request->input('work_competency')
-        ));
+        // WorkCompetencie::create(array_merge(
+        //     ['alumni_id' => $alumni->id],
+        //     $request->input('work_competency')
+        // ));
         session()->forget('submission_id');
 
         return redirect()->route('alumni.form')->with('success', 'Formulir sudah disubmit bree!');
@@ -156,7 +167,7 @@ class AlumniFormController extends Controller
 
         foreach ($this->kompetensiFields as $field => $label) {
             $inValues = implode(',', $this->kompetensiOptions);
-            $rules["graduate_competency.$field"] = "required|in:$inValues";
+            $rules["kompetensi_lulus.$field"] = "required|in:$inValues";
             $rules["work_competency.$field"] = "required|in:$inValues";
         }
 

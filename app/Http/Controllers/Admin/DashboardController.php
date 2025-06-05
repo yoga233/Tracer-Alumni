@@ -11,44 +11,36 @@ class DashboardController extends Controller
 {
     public function showdashboard()
     {
-        $alumni = Alumni::where('graduation_year', '>=', 2020)->count();
+        $alumni = Alumni::where('tahun_lulus', '>=', 2020)->count();
 
-        //status pekerjaan alumni
-        $employment_status = Alumni::where('graduation_year', '>=', 2020)
-            ->select('employment_status', DB::raw('count(*) as total'))
-            ->groupBy('employment_status')
-            ->pluck('total', 'employment_status');
+        // status pekerjaan alumni
+        $employment_status = Alumni::where('tahun_lulus', '>=', 2020)
+            ->groupBy('status_saat_ini')
+            ->select('status_saat_ini', DB::raw('count(*) as total'))
+            ->get();
 
         if ($employment_status->isEmpty()) {
             $employment_status = collect(['Belum Ada Data' => 1]);
         }
 
-        //alumni per angkatan
-        $graduationChart = Alumni::where('graduation_year', '>=', 2020)
-            ->selectRaw('graduation_year, COUNT(*) as total')
-            ->groupBy('graduation_year')
-            ->orderBy('graduation_year')
-            ->pluck('total', 'graduation_year');
+        // alumni per angkatan
+        $graduationChart = Alumni::where('tahun_lulus', '>=', 2020)
+            ->selectRaw('tahun_lulus, COUNT(*) as total')
+            ->groupBy('tahun_lulus')
+            ->orderBy('tahun_lulus')
+            ->pluck('total', 'tahun_lulus');
 
-            if ($graduationChart->isEmpty()) {
-                $graduationChart = collect(['Belum Ada Data' => 1]);
-            }
+        if ($graduationChart->isEmpty()) {
+            $graduationChart = collect(['Belum Ada Data' => 1]);
+        }
 
-        //alumni per jurusan
-        $majorChart = Alumni::where('graduation_year', '>=', 2020)
-            ->select('major', DB::raw('count(*) as total'))
-            ->groupBy('major')
-            ->pluck('total', 'major');
-
-            if ($majorChart->isEmpty()) {
-                $majorChart = collect(['Belum Ada Data' => 1]);
-            }
+        // Hapus bagian alumni per jurusan karena kolom 'major' tidak ada
+        // Kalau mau tampilkan data jurusan, pastikan kolomnya ada di database dulu
 
         return view('admin.dashboard', compact(
             'alumni',
             'employment_status',
-            'graduationChart',
-            'majorChart'
+            'graduationChart'
         ));
     }
 }

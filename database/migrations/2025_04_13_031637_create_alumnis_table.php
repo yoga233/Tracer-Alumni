@@ -13,19 +13,26 @@ return new class extends Migration
 
     public function up()
     {
-        Schema::create('alumnis', function (Blueprint $table) {
-            $table->id();  
-            $table->string('name'); 
-            $table->string('email')->unique(); 
-            $table->string('major');
-            $table->year('graduation_year');  
-            $table->enum('employment_status', ['Bekerja', 'Belum Bekerja','Wirausaha','Freelance','Studi Lanjut'])->default('Belum Bekerja');
-            $table->enum('mounth_waiting',['<= 3 bulan','<= 6 bulan','<= 9 bulan','<= 12 bulan'])->nullable();
-            $table->enum('type_company', ['Lokal','Nasional','Internasional'])->nullable();
-            $table->enum('closeness_workfield', ['Sangat erat','Erat','Cukup erat','Tidak erat'])->nullable();
-            $table->string('phone_number')->nullable();  
-            $table->string('address')->nullable(); 
-            $table->timestamps();
+            Schema::create('alumnis', function (Blueprint $table) {
+                $table->id();
+                $table->year('tahun_lulus'); // Tahun Lulus
+                $table->string('npm')->unique(); // Nomor Pokok Mahasiswa
+                $table->string('nama_mahasiswa'); // Nama Mahasiswa
+                $table->string('nik', 20)->unique(); // NIK / Nomor KTP
+                $table->date('tanggal_lahir'); // Tanggal Lahir
+                $table->string('email')->unique(); // Alamat Email
+                $table->string('nomor_telepon')->nullable(); // Nomor Telepon / HP
+                $table->string('npwp')->nullable(); // NPWP
+                $table->string('nama_dosen_pembimbing'); // Nama Dosen Pembimbing (tanpa gelar)
+                $table->string('sumber_pembiayaan_kuliah')->nullable();
+                $table->enum('status_saat_ini', [
+                    'Bekerja (full time/part time)',
+                    'Belum Memungkinkan Bekerja',
+                    'Wiraswasta',
+                    'Melanjutkan Pendidikan',
+                    'Tidak Kerja Tetapi Sedang Mencari Kerja'
+                ])->nullable();            
+                $table->timestamps();
         });
     }
     
