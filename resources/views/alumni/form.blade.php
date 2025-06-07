@@ -1,155 +1,156 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Formulir Alumni - Tracer Study ITATS</title>
     @vite('resources/css/app.css')
-</head>
-<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col">
+    <style>
+        .progress-bar-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.875rem;
+        color: #666;
+        }
+        .progress-bar {
+        height: 4px;
+        flex: 1;
+        background-color: #e5e7eb;
+        margin: 0 0.5rem;
+        border-radius: 9999px;
+        overflow: hidden;
+        }
+        .progress-bar-fill {
+        background-color: #3b82f6;
+        height: 100%;
+        width: 0%;
+        transition: width 0.3s ease;
+        }
+    </style>
+    </head>
+    <body class="bg-[#F2EBDC] min-h-screen flex items-center justify-center">
 
-    <div class="flex-1 w-full">
-        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-gray-100 w-full max-w-[40rem] mx-auto bg-transparent">
 
-            <!-- Header & Logo -->
-            <nav class="bg-white shadow-sm py-4 relative">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <img src="{{ asset('assets/OIP.jpg') }}" alt="Logo ITATS" class="h-12 w-12 object-contain">
-                            <div>
-                                <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Tracer Study Lulusan ITATS</h1>
-                                <p class="text-sm text-gray-600">Program Studi Teknik Informatika</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="absolute inset-x-0 bottom-0 mx-auto w-full h-px bg-gray-200"></div>
-            </nav>
-
-            <div class="bg-white shadow-sm sm:rounded-lg p-6 mt-6">
-
-                <!-- Box sambutan -->
-                <div class="mb-8 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded">
-                    <h3 class="font-bold text-lg mb-2">Selamat Datang!</h3>
-                    <p>Terima kasih atas partisipasi Anda dalam mengisi Tracer Study Lulusan ITATS</p>
-                    <p class="mt-2">Tracer study ini hanya untuk program studi / jurusan yang masih aktif. Isi semua pertanyaan sesuai dengan kondisi Anda saat ini.</p>
-                    <ul class="list-disc list-inside mt-2 space-y-1">
-                        <li>1. Mengevaluasi kualitas program pendidikan di ITATS.</li>
-                        <li>2. Memahami pengembangan karir lulusan.</li>
-                        <li>3. Meningkatkan kualitas pendidikan dan layanan kemahasiswaan.</li>
-                    </ul>
-                    <p class="mt-4">Jika ada pertanyaan, hubungi <strong>Pak Isa Albanna</strong> via WA <strong>0858-1568-3477</strong> atau email <strong>isaalbanna@itats.ac.id</strong>.</p>
-                </div>
-
-                <p class="text-red-600 font-semibold italic mb-6">* Wajib diisi</p>
-
-                <form action="{{ route('alumni.form.submit') }}" method="POST" class="space-y-6">
-                    @csrf
-
-                    @if (!empty($questions) && $questions->count())
-                        @foreach ($questions as $index => $question)
-                            <div class="space-y-1">
-                                <label class="block font-medium text-gray-700">
-                                    <span class="font-bold text-lg">{{ $index + 1 }}. </span>{{ $question->question_text }} <span class="text-red-600">*</span>
-                                </label>
-
-                                @if ($question->type->name == 'text')
-                                    <input type="text" name="answers[{{ $question->id }}]" required
-                                        class="form-input w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-
-                                @elseif ($question->type->name == 'textarea')
-                                    <textarea name="answers[{{ $question->id }}]" rows="4" required
-                                        class="form-textarea w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
-
-                                @elseif ($question->type->name == 'radio' && is_array($question->options))
-                                    <div class="space-y-2">
-                                        @foreach ($question->options as $option)
-                                            <label class="inline-flex items-center">
-                                                <input type="radio" name="answers[{{ $question->id }}]" value="{{ $option }}" required class="form-radio text-blue-600">
-                                                <span class="ml-2">{{ $option }}</span>
-                                            </label><br>
-                                        @endforeach
-                                    </div>
-
-                                @elseif ($question->type->name == 'checkbox' && is_array($question->options))
-                                    <div class="space-y-2">
-                                        @foreach ($question->options as $option)
-                                            <label class="inline-flex items-center">
-                                                <input type="checkbox" name="answers[{{ $question->id }}][]" value="{{ $option }}" class="form-checkbox text-blue-600">
-                                                <span class="ml-2">{{ $option }}</span>
-                                            </label><br>
-                                        @endforeach
-                                    </div>
-
-                                @elseif ($question->type->name == 'select' && is_array($question->options))
-                                    <select name="answers[{{ $question->id }}]" required
-                                        class="form-select w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                                        @foreach ($question->options as $option)
-                                            <option value="{{ $option }}">{{ $option }}</option>
-                                        @endforeach
-                                    </select>
-
-                                @elseif ($question->type->name == 'scale' && is_array($question->options))
-                                    <div class="flex gap-4 items-center">
-                                        @foreach ($question->options as $option)
-                                            <label class="flex flex-col items-center">
-                                                <input type="radio" name="answers[{{ $question->id }}]" value="{{ $option }}" required class="form-radio text-blue-600">
-                                                <span class="mt-1 text-sm">{{ $option }}</span>
-                                            </label>
-                                        @endforeach
-                                    </div>
-
-                                @elseif ($question->type->name == 'matrix' && is_array($question->options['rows']) && is_array($question->options['columns']))
-                                    <div class="overflow-x-auto">
-                                        <table class="table-auto border w-full text-sm text-center">
-                                            <thead class="bg-gray-100">
-                                                <tr>
-                                                    <th class="border px-2 py-2 text-left">Pernyataan</th>
-                                                    @foreach ($question->options['columns'] as $column)
-                                                        <th class="border px-2 py-2">{{ $column }}</th>
-                                                    @endforeach
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach ($question->options['rows'] as $rowIndex => $rowText)
-                                                    <tr>
-                                                        <td class="border px-2 py-2 text-left">{{ $rowText }}</td>
-                                                        @foreach ($question->options['columns'] as $colIndex => $column)
-                                                            <td class="border px-2 py-2">
-                                                                <input type="radio"
-                                                                    name="answers[{{ $question->id }}][{{ $rowIndex }}]"
-                                                                    value="{{ $column }}"
-                                                                    required
-                                                                    class="form-radio text-blue-600">
-                                                            </td>
-                                                        @endforeach
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                @endif
-
-                                @error('answers.' . $question->id)
-                                    <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
-                        @endforeach
-                    @else
-                        <p class="text-center text-gray-500">Tidak ada pertanyaan yang tersedia saat ini.</p>
-                    @endif
-
-                    <div class="flex justify-end pt-4">
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-md shadow-md transition">
-                            Kirim Formulir
-                        </button>
-                    </div>
-                </form>
+        @include('alumni.partials.nav-form')
+        <img src="{{ asset('images/image.png') }}" alt="Ilustrasi Tracer Study" class="py-4 relative rounded">
+        @include('alumni.partials.box-sambutan')
+        
+            <form id="multiStepForm" action="{{ route('alumni.form.submit') }}" method="POST" class="space-y-6">
+            
+            @csrf
+            <!-- Halaman-halaman -->
+            <div class="step" id="step1">
+                @include('alumni.partials.form-informasi-alumni')
             </div>
 
-        </div>
+            <div class="step hidden" id="step2">
+                @include('alumni.partials.dinamis-pertanyaan')
+                @include('alumni.partials.kompetensi_saat_lulus')
+            </div>
+
+            <!-- Bisa ditambah halaman di sini -->
+            <!-- <div class="step hidden" id="step3">...</div> -->
+            <div class="step hidden" id="step3">
+                @include('alumni.partials.pekerjaan')
+            </div>
+
+
+            <!-- Progress dan tombol -->
+            <div class="flex items-center justify-between mt-4">
+                <div class="flex items-center gap-2 text-sm">
+                <button type="button" id="resetBtn" class="text-yellow-600 hover:underline">Kosongkan formulir</button>
+                </div>
+                <div class="flex-1 flex items-center justify-center">
+                <div class="progress-bar-container">
+                    <span>Halaman <span id="currentPage">1</span> dari <span id="totalPages">1</span></span>
+                    <div class="progress-bar">
+                    <div id="progressFill" class="progress-bar-fill"></div>
+                    </div>
+                </div>
+                </div>
+                <div class="flex gap-2">
+                <button type="button" id="prevBtn" class="bg-white border border-gray-300 px-4 py-2 rounded text-sm hidden">Sebelumnya</button>
+                <button type="button" id="nextBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded text-sm">Berikutnya</button>
+                <button type="submit"  id="submitBtn" class="submitBtn hidden bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-md shadow-md transition">
+        Kirim Formulir
+    </button>
+
+                </div>
+            </div>
+            </form>
+
+        
     </div>
+
+    <script>
+        const steps = document.querySelectorAll('.step');
+        const totalSteps = steps.length;
+        let currentStep = 1;
+
+        const nextBtn = document.getElementById('nextBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const progressFill = document.getElementById('progressFill');
+        const currentPage = document.getElementById('currentPage');
+        const totalPages = document.getElementById('totalPages');
+        const resetBtn = document.getElementById('resetBtn');
+        const form = document.getElementById('multiStepForm');
+
+        totalPages.textContent = totalSteps;
+
+        function showStep(step) {
+        steps.forEach((s, i) => {
+            if (i === step - 1) {
+            s.classList.remove('hidden');
+            } else {
+            s.classList.add('hidden');
+            }
+        });
+
+        currentPage.textContent = step;
+        const progress = (step / totalSteps) * 100;
+        progressFill.style.width = progress + '%';
+
+        if (step === 1) {
+            prevBtn.classList.add('hidden');
+            nextBtn.classList.remove('hidden');
+            submitBtn.classList.add('hidden');
+        } else if (step === totalSteps) {
+            prevBtn.classList.remove('hidden');
+            nextBtn.classList.add('hidden');
+            submitBtn.classList.remove('hidden');
+        } else {
+            prevBtn.classList.remove('hidden');
+            nextBtn.classList.remove('hidden');
+            submitBtn.classList.add('hidden');
+        }
+        }
+
+        nextBtn.addEventListener('click', () => {
+        if (currentStep < totalSteps) {
+            currentStep++;
+            showStep(currentStep);
+        }
+        });
+
+        prevBtn.addEventListener('click', () => {
+        if (currentStep > 1) {
+            currentStep--;
+            showStep(currentStep);
+        }
+        });
+
+        resetBtn.addEventListener('click', () => {
+        form.reset();
+        currentStep = 1;
+        showStep(currentStep);
+        });
+
+        // Inisialisasi
+        showStep(currentStep);
+    </script>
 
 </body>
 </html>

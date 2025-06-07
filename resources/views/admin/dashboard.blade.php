@@ -1,164 +1,289 @@
 <x-app-layout>
   <x-slot name="header">
-    <h2 class="text-3xl font-semibold text-gray-100">
-      Dashboard Alumni
-    </h2>
+    <div class="mb-6 flex flex-col gap-2 animate-fancy-in">
+      <div class="flex items-center gap-3">
+        <i class="fas fa-tachometer-alt text-blue-600 text-3xl"></i>
+        <div>
+          <h2 class="text-3xl font-bold text-gray-800">
+            Dashboard Alumni
+          </h2>
+          <p class="text-sm text-gray-600 mt-1">
+            Selamat datang di panel kontrol alumni, kelola data dan informasi dengan mudah.
+          </p>
+        </div>
+      </div>
+      <!-- Garis pemisah -->
+      <div class="border-b-2 border-blue-600 w-32"></div>
+</div>
+
+
   </x-slot>
 
-  <div class="bg-gray-900 min-h-screen py-8 text-gray-100">
+  <div class="bg-gray-50 min-h-screen py-8 text-gray-800">
     <div class="max-w-7xl mx-auto px-4">
-      <!-- Cards Statistik -->
+
+      <!-- Statistik Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-gray-800 border-l-4 border-indigo-500 p-6 rounded-xl shadow-lg flex items-center justify-between transition-transform hover:scale-105">
+        <div class="bg-white border-l-4 border-indigo-500 p-6 rounded-xl shadow hover:shadow-md transition-transform hover:scale-[1.02] flex items-center justify-between">
           <div>
-            <p class="text-sm text-gray-400">Daily Views</p>
-            <h3 class="text-2xl font-bold">1,504</h3>
+            <p class="text-sm text-gray-500">Total Alumni</p>
+            <h3 class="text-2xl font-bold">{{ $alumni }}</h3>
           </div>
-          <span class="text-3xl">👁️</span>
+          <span class="text-3xl text-indigo-500">👥</span>
         </div>
-        <div class="bg-gray-800 border-l-4 border-green-500 p-6 rounded-xl shadow-lg flex items-center justify-between transition-transform hover:scale-105">
+
+        <div class="bg-white border-l-4 border-green-500 p-6 rounded-xl shadow hover:shadow-md transition-transform hover:scale-[1.02] flex items-center justify-between">
           <div>
-            <p class="text-sm text-gray-400">Sales</p>
+            <p class="text-sm text-gray-500">Pendaftaran</p>
             <h3 class="text-2xl font-bold">80</h3>
           </div>
-          <span class="text-3xl">🛒</span>
+          <span class="text-3xl text-green-500">🛒</span>
         </div>
-        <div class="bg-gray-800 border-l-4 border-yellow-500 p-6 rounded-xl shadow-lg flex items-center justify-between transition-transform hover:scale-105">
+
+        <div class="bg-white border-l-4 border-yellow-500 p-6 rounded-xl shadow hover:shadow-md transition-transform hover:scale-[1.02] flex items-center justify-between">
           <div>
-            <p class="text-sm text-gray-400">Comments</p>
+            <p class="text-sm text-gray-500">Komentar</p>
             <h3 class="text-2xl font-bold">284</h3>
           </div>
-          <span class="text-3xl">💬</span>
+          <span class="text-3xl text-yellow-500">💬</span>
         </div>
-        <div class="bg-gray-800 border-l-4 border-pink-500 p-6 rounded-xl shadow-lg flex items-center justify-between transition-transform hover:scale-105">
+
+        <div class="bg-white border-l-4 border-pink-500 p-6 rounded-xl shadow hover:shadow-md transition-transform hover:scale-[1.02] flex items-center justify-between">
           <div>
-            <p class="text-sm text-gray-400">Earning</p>
+            <p class="text-sm text-gray-500">Penghasilan</p>
             <h3 class="text-2xl font-bold">$7,842</h3>
           </div>
-          <span class="text-3xl">💵</span>
+          <span class="text-3xl text-pink-500">💵</span>
         </div>
       </div>
 
       <!-- Charts -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Pie Chart -->
-        <div class="bg-gray-800 border border-gray-700 p-6 rounded-xl shadow-lg transition-transform hover:scale-105">
+        
+        @php
+          $cardClass = "bg-white border border-gray-200 p-6 rounded-xl shadow hover:shadow-md transition-transform hover:scale-[1.02]";
+          $titleClass = "text-lg font-semibold text-gray-800 mb-4 text-center border-b border-gray-200 pb-2";
+          $buttonClass = "mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-lg shadow transition";
+        @endphp
+
+        <div class="{{ $cardClass }}">
+          <h3 class="{{ $titleClass }}">📊 Status Alumni</h3>
           <canvas id="pieChart" class="w-full h-64"></canvas>
-          <button id="downloadPieChart" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-6 rounded-lg shadow-md transition">
-            Download Pie Chart
-          </button>
+          @if($statusAlumniLabels->isEmpty())
+            <p class="text-center text-gray-500 mt-4 italic">Data alumni belum tersedia..</p>
+          @endif
+          <button id="downloadPieChart" class="{{ $buttonClass }}">Download Pie Chart</button>
         </div>
 
-        <!-- Bar Chart -->
-        <div class="bg-gray-800 border border-gray-700 p-6 rounded-xl shadow-lg transition-transform hover:scale-105">
+        <div class="{{ $cardClass }}">
+          <h3 class="{{ $titleClass }}">📊 Jumlah Alumni per Status Pekerjaan</h3>
           <canvas id="barChart" class="w-full h-64"></canvas>
-          <button id="downloadBarChart" class="mt-4 bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded-lg shadow-md transition">
-            Download Bar Chart
-          </button>
+          <button id="downloadBarChart" class="{{ str_replace('bg-blue', 'bg-green', $buttonClass) }}">Download Bar Chart</button>
         </div>
 
-        <!-- Line Chart -->
-        <div class="bg-gray-800 border border-gray-700 p-6 rounded-xl shadow-lg transition-transform hover:scale-105">
+        <div class="{{ $cardClass }}">
+          <h3 class="{{ $titleClass }}">📈 Perkembangan Alumni per Angkatan</h3>
           <canvas id="lineChart" class="w-full h-64"></canvas>
-          <button id="downloadLineChart" class="mt-4 bg-yellow-600 hover:bg-yellow-700 text-white py-2 px-6 rounded-lg shadow-md transition">
-            Download Line Chart
-          </button>
+          <button id="downloadLineChart" class="{{ str_replace('bg-blue', 'bg-yellow', $buttonClass) }}">Download Line Chart</button>
         </div>
 
-        <!-- Radar Chart -->
-        <div class="bg-gray-800 border border-gray-700 p-6 rounded-xl shadow-lg transition-transform hover:scale-105">
+        <div class="{{ $cardClass }}">
+          <h3 class="{{ $titleClass }}">⏳ Waktu Tunggu Alumni Bekerja</h3>
           <canvas id="radarChart" class="w-full h-64"></canvas>
-          <button id="downloadRadarChart" class="mt-4 bg-pink-600 hover:bg-pink-700 text-white py-2 px-6 rounded-lg shadow-md transition">
-            Download Radar Chart
-          </button>
+          <button id="downloadRadarChart" class="{{ str_replace('bg-blue', 'bg-pink', $buttonClass) }}">Download Radar Chart</button>
         </div>
       </div>
+
     </div>
   </div>
 
-  <!-- Chart.js & jsPDF -->
+   <!-- Script (tetap pakai Chart.js dan jsPDF) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const darkTick = '#E5E7EB';
-      const darkGrid = 'rgba(229,231,235,0.2)';
-      const cfg = (ctx,type,data,opts) => new Chart(ctx, { type, data, options: opts });
+ <script>
+      Chart.register(ChartDataLabels);
 
-      // Pie Chart
-      const pieCtx = document.getElementById('pieChart').getContext('2d');
-      cfg(pieCtx, 'pie', {
-        labels: ['Facebook','YouTube','Amazon'],
-        datasets:[{ data:[300,500,400], backgroundColor:['#6366F1','#10B981','#FBBF24'] }]
-      }, {
-        plugins:{ legend:{ labels:{ color:darkTick } } }
-      });
+      document.addEventListener('DOMContentLoaded', () => {
+        const textColor = '#374151';
+        const gridColor = 'rgba(55,65,81,0.1)';
+        
+        //pembantu untuk membuat chart biar gmpang
+        const createChart = (ctx, type, data, options) => new Chart(ctx, { type, data, options });
 
-      // Bar Chart
-      const barCtx = document.getElementById('barChart').getContext('2d');
-      cfg(barCtx, 'bar', {
-        labels: ['Facebook','YouTube','Amazon'],
-        datasets:[{ label:'Earnings', data:[700,850,1000], backgroundColor:['#6366F1','#10B981','#FBBF24'] }]
-      }, {
-        scales: {
-          x:{ ticks:{ color:darkTick }, grid:{ color:darkGrid } },
-          y:{ beginAtZero:true, ticks:{ color:darkTick }, grid:{ color:darkGrid } }
-        },
-        plugins:{ legend:{ labels:{ color:darkTick } } }
-      });
-
-      // Line Chart
-      const lineCtx = document.getElementById('lineChart').getContext('2d');
-      cfg(lineCtx, 'line', {
-        labels: ['Jan','Feb','Mar','Apr','May'],
-        datasets:[{
-          label:'Revenue',
-          data:[65,59,80,81,56],
-          borderColor:'#6366F1',
-          backgroundColor:'rgba(99,102,241,0.2)',
-          fill:true,
-          tension:0.4
-        }]
-      }, {
-        scales: {
-          x:{ ticks:{ color:darkTick }, grid:{ color:darkGrid } },
-          y:{ beginAtZero:true, ticks:{ color:darkTick }, grid:{ color:darkGrid } }
-        },
-        plugins:{ legend:{ labels:{ color:darkTick } } }
-      });
-
-      // Radar Chart
-      const radarCtx = document.getElementById('radarChart').getContext('2d');
-      cfg(radarCtx, 'radar', {
-        labels: ['Facebook','YouTube','Amazon'],
-        datasets:[{
-          label:'Earnings',
-          data:[400,500,700],
-          borderColor:'#6366F1',
-          backgroundColor:'rgba(99,102,241,0.2)',
-          fill:true
-        }]
-      }, {
-        plugins:{ legend:{ labels:{ color:darkTick } } }
-      });
-
-      // PDF Downloads
-      const downloads = [
-        { btn:'downloadPieChart',       canvas:'pieChart',   title:'Pie Chart - Traffic Source',  file:'pie_chart.pdf' },
-        { btn:'downloadBarChart',       canvas:'barChart',   title:'Bar Chart - Earnings',        file:'bar_chart.pdf' },
-        { btn:'downloadLineChart',      canvas:'lineChart',  title:'Line Chart - Revenue',        file:'line_chart.pdf' },
-        { btn:'downloadRadarChart',     canvas:'radarChart', title:'Radar Chart - Earnings',       file:'radar_chart.pdf' }
-      ];
-      downloads.forEach(({btn,canvas,title,file}) => {
-        document.getElementById(btn).addEventListener('click', () => {
-          const { jsPDF } = window.jspdf;
-          const doc = new jsPDF();
-          const can = document.getElementById(canvas);
-          doc.text(title,10,10);
-          doc.addImage(can.toDataURL('image/png'),'PNG',10,20,180,160);
-          doc.save(file);
+        createChart(document.getElementById('pieChart'), 'pie', {
+          labels: @json($statusAlumniLabels),
+          datasets: [{
+            data: @json($statusAlumniData),
+            backgroundColor: [
+              '#3B82F6',
+              '#10B981',
+              '#FBBF24',
+              '#EC4899',
+              '#8B5CF6'
+            ],
+            borderColor: '#fff',
+            borderWidth: 2
+          }]
+        }, {
+          plugins: {
+            legend: { labels: { color: textColor } },
+            datalabels: {
+              color: '#fff',
+              font: { weight: 'bold', size: 14 },
+              textStrokeColor: 'rgba(0,0,0,0.6)',
+              textStrokeWidth: 2,
+              formatter: (value, context) => {
+                const dataArr = context.chart.data.datasets[0].data;
+                const sum = dataArr.reduce((a,b) => a+b, 0);
+                const percentage = (value / sum * 100).toFixed(1) + '%';
+                return percentage;
+              }
+            }
+          }
         });
+
+        const totalAlumni = @json($statusAlumniData).reduce((a,b) => a + b, 0);
+
+        createChart(document.getElementById('barChart'), 'bar', {
+          labels: @json($statusAlumniLabels),
+          datasets: [{
+            label: 'Total Alumni: ' + totalAlumni,
+            data: @json($statusAlumniData),
+            backgroundColor: [
+              'rgba(59, 130, 246, 0.8)',
+              'rgba(16, 185, 129, 0.8)',
+              'rgba(245, 158, 11, 0.8)',
+              'rgba(236, 72, 153, 0.8)',
+              'rgba(139, 92, 246, 0.8)'
+            ],
+            borderRadius: 6
+          }]
+        }, {
+          scales: {
+            x: { ticks: { color: textColor }, grid: { color: gridColor } },
+            y: { beginAtZero: true, ticks: { color: textColor }, grid: { color: gridColor } }
+          },
+          plugins: {
+            legend: { labels: { color: textColor } },
+            datalabels: {
+              color: '#fff',
+              font: { weight: 'bold', size: 16 },
+              textStrokeColor: 'rgba(0,0,0,0.6)',
+              textStrokeWidth: 3
+            }
+          }
+        });
+
+        createChart(document.getElementById('lineChart'), 'line', {
+          labels: @json($angkatanLabels),
+          datasets: [{
+            label: 'Jumlah Alumni per Angkatan',
+            data: @json($angkatanData),
+            borderColor: '#2563EB',
+            backgroundColor: 'rgba(37, 99, 235, 0.2)',
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#2563EB',
+            pointRadius: 5
+          }]
+        }, {
+          scales: {
+            x: { ticks: { color: textColor }, grid: { color: gridColor } },
+            y: { beginAtZero: true, ticks: { color: textColor }, grid: { color: gridColor } }
+          },
+          plugins: {
+            legend: { labels: { color: textColor } },
+            datalabels: {
+              color: '#2563EB',
+              anchor: 'end',
+              align: 'top',
+              font: { weight: 'bold', size: 12 },
+              formatter: (value) => value
+            }
+          }
+        });
+
+        createChart(document.getElementById('radarChart'), 'radar', {
+          labels: @json($waktuTungguLabels),
+          datasets: [{
+            label: 'Jumlah Alumni',
+            data: @json($waktuTungguData),
+            borderColor: '#DB2777',
+            backgroundColor: 'rgba(219, 39, 119, 0.3)', 
+            fill: true
+          }]
+        }, {
+          plugins: {
+            legend: { labels: { color: textColor } },
+            datalabels: {
+              color: '#2563EB',
+              font: { weight: 'bold', size: 12 },
+              anchor: 'end',
+              align: 'start',
+              offset: 8,
+                formatter: (value, context) => {
+                  const label = context.chart.data.labels[context.dataIndex];//dari sini value
+                  return `${label} = ${value} orang`; //'value' adalah elemen pada array 'data' di datasets[0], sesuai dengan indeks (context.dataIndex)
+                      //context.dataIndex = 1
+                      // label = data.labels[1] = '1-3 bulan'
+                      // value = data.datasets[0].data[1] = 25
+                }
+            }
+          },
+          scales: {
+            r: {
+              pointLabels: { color: textColor, font: { size: 15 } },
+              ticks: {
+                beginAtZero: true,
+                stepSize: 1,
+                precision: 0,
+                color: textColor
+              },
+              grid: { color: 'rgba(0,0,0,0.1)' }
+            }
+          }
+        });
+
+        //mengolah pdf
+      const { jsPDF } = window.jspdf;
+    const downloadChart = (btnId, canvasId, title, filename) => {
+      document.getElementById(btnId).addEventListener('click', () => {
+        const canvas = document.getElementById(canvasId);
+        const pdf = new jsPDF();
+
+        const today = new Date().toLocaleDateString('id-ID', {
+          day: '2-digit', month: 'long', year: 'numeric'
+        });
+
+        pdf.setFontSize(16);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(title, 10, 15);
+
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`Tanggal: ${today}`, 10, 22);
+
+        pdf.setDrawColor(0);
+        pdf.line(10, 25, 200, 25);
+
+        const image = canvas.toDataURL('image/png');
+        pdf.addImage(image, 'PNG', 10, 30, 180, 130);
+
+        pdf.setFontSize(8);
+        pdf.setTextColor(150);
+        pdf.text('Download dari Sistem Tracer Alumni', 10, 285);
+
+        pdf.save(filename);
       });
-    });
-  </script>
+    };
+
+    downloadChart('downloadPieChart', 'pieChart', 'Status Alumni', 'pie_chart.pdf');
+    downloadChart('downloadBarChart', 'barChart', 'Distribusi Alumni Berdasarkan Pekerjaan', 'bar_chart.pdf');
+    downloadChart('downloadLineChart', 'lineChart', 'Jumlah Alumni per Angkatan', 'line_chart.pdf');
+    downloadChart('downloadRadarChart', 'radarChart', 'Waktu Tunggu Alumni Mendapatkan Pekerjaan', 'radar_chart.pdf');
+
+      });
+</script>
+
 </x-app-layout>
