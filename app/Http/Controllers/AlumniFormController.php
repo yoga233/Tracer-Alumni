@@ -3,27 +3,29 @@
 namespace App\Http\Controllers;
 
 use App\Models\Alumni;
-use App\Models\QuestionCondition;
-use App\Models\Option;
 use App\Models\Question;
 use App\Models\Submission;
-use App\Models\AlumniAnswer;
-use App\Models\KompetensiLulus;
-use App\Models\WorkCompetencie;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Models\AlumniAnswer;
+use Illuminate\Http\Request;
+use App\Models\JenisPerusahaan;
+use App\Models\KompetensiKerja;
+use App\Models\KompetensiLulus;
+use App\Models\WaktuTungguKerja;
+use App\Models\KeeratanStudiKerja;
 
 class AlumniFormController extends Controller
 {
     protected array $kompetensiFields = [
-        'Etika' => 'Etika',
-        'Keahlian berdasarkan bidang ilmu' => 'Keahlian berdasarkan bidang ilmu',
-        'Bahasa Inggris' => 'Bahasa Inggris',
-        'Penggunaan Teknologi Informasi' => 'Penggunaan Teknologi Informasi',
-        'Komunikasi' => 'Komunikasi',
-        'Kerjasama tim' => 'Kerjasama tim',
-        'Pengembangan diri' => 'Pengembangan diri',
+        'etika' => 'Etika',
+        'keahlian_bidang_ilmu' => 'Keahlian berdasarkan bidang ilmu',
+        'bahasa_inggris' => 'Bahasa Inggris',
+        'penggunaan_teknologi_informasi' => 'Penggunaan Teknologi Informasi',
+        'komunikasi' => 'Komunikasi',
+        'kerjasama_tim' => 'Kerjasama tim',
+        'pengembangan_diri' => 'Pengembangan diri',
     ];
+
 
     protected array $kompetensiOptions = [
         'Sangat Rendah',
@@ -86,8 +88,6 @@ class AlumniFormController extends Controller
             'nomor_telepon' => 'nullable|string',
             'npwp' => 'nullable|string',
             'nama_dosen_pembimbing' => 'required|string',
-            'sumber_pembiayaan_kuliah' => 'nullable|string|max:255',
-            'sumber_lainnya' => 'required_if:sumber_pembiayaan_kuliah,Yang lain|string|max:255',
             'status_saat_ini' => 'required|in:Bekerja (full time/part time),Belum Memungkinkan Bekerja,Tidak Kerja tetapi sedang mencari kerja,Wiraswasta,Melanjutkan Pendidikan',
         ];
 
@@ -148,29 +148,45 @@ class AlumniFormController extends Controller
                 ]);
             }
         }
-        KompetensiLulus::create(array_merge(
+            KompetensiLulus::create(array_merge(
             ['alumni_id' => $alumni->id],
             $request->input('kompetensi_lulus')
         ));
-        // WorkCompetencie::create(array_merge(
-        //     ['alumni_id' => $alumni->id],
-        //     $request->input('work_competency')
-        // ));
+
+        KompetensiKerja::create(array_merge(
+            ['alumni_id' => $alumni->id],
+            $request->input('kompetensi_kerja')
+        ));
+
+     KeeratanStudiKerja::create([
+    'alumni_id' => $alumni->id,
+    'keeratan_bidang_studi' => $request->input('keeratan_bidang_studi.keeratan'), 
+]);
+
+JenisPerusahaan::create([
+    'alumni_id' => $alumni->id,
+    'jenis_perusahaan' => $request->input('jenis_perusahaan'),
+]);
+
+WaktuTungguKerja::create([
+    'alumni_id' => $alumni->id,
+    'waktu_tunggu_bulan' => $request->input('waktu_tunggu_pekerjaan'),  
+]);
         session()->forget('submission_id');
 
         return redirect()->route('alumni.form')->with('success', 'Formulir sudah disubmit bree!');
     }
 
-    private function buildKompetensiValidation(): array
-    {
-        $rules = [];
+    // private function buildKompetensiValidation(): array
+    // {
+    //     $rules = [];
 
-        foreach ($this->kompetensiFields as $field => $label) {
-            $inValues = implode(',', $this->kompetensiOptions);
-            $rules["kompetensi_lulus.$field"] = "required|in:$inValues";
-            $rules["work_competency.$field"] = "required|in:$inValues";
-        }
+    //     foreach ($this->kompetensiFields as $field => $label) {
+    //         $inValues = implode(',', $this->kompetensiOptions);
+    //         $rules["kompetensi_lulus.$field"] = "required|in:$inValues";
+    //         $rules["kompetensi_kerja.$field"] = "required|in:$inValues";
+    //     }
 
-        return $rules;
-    }
+    //     return $rules;
+    // }
 }

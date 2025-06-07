@@ -22,7 +22,7 @@ return new class extends Migration
 
             $table->boolean('is_required')->default(false);
 
-            $table->json('scale_labels')->nullable(); // untuk label skala
+            $table->json('scale_labels')->nullable(); 
 
             $table->timestamps();
         });

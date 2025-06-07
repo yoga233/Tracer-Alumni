@@ -69,7 +69,7 @@
         <div class="{{ $cardClass }}">
           <h3 class="{{ $titleClass }}">📊 Status Alumni</h3>
           <canvas id="pieChart" class="w-full h-64"></canvas>
-          @if($employment_status->isEmpty())
+          @if($statusAlumniLabels->isEmpty())
             <p class="text-center text-gray-500 mt-4 italic">Data alumni belum tersedia..</p>
           @endif
           <button id="downloadPieChart" class="{{ $buttonClass }}">Download Pie Chart</button>
@@ -88,109 +88,202 @@
         </div>
 
         <div class="{{ $cardClass }}">
-          <h3 class="{{ $titleClass }}">🧭 Perbandingan Alumni per Jurusan</h3>
+          <h3 class="{{ $titleClass }}">⏳ Waktu Tunggu Alumni Bekerja</h3>
           <canvas id="radarChart" class="w-full h-64"></canvas>
           <button id="downloadRadarChart" class="{{ str_replace('bg-blue', 'bg-pink', $buttonClass) }}">Download Radar Chart</button>
         </div>
-
       </div>
 
     </div>
   </div>
 
-  <!-- Script (tetap pakai Chart.js dan jsPDF) -->
+   <!-- Script (tetap pakai Chart.js dan jsPDF) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const textColor = '#374151'; // text-gray-700
-      const gridColor = 'rgba(55,65,81,0.1)'; // lighter gray
+ <script>
+      Chart.register(ChartDataLabels);
 
-      const createChart = (ctx, type, data, options) => new Chart(ctx, { type, data, options });
+      document.addEventListener('DOMContentLoaded', () => {
+        const textColor = '#374151';
+        const gridColor = 'rgba(55,65,81,0.1)';
+        
+        //pembantu untuk membuat chart biar gmpang
+        const createChart = (ctx, type, data, options) => new Chart(ctx, { type, data, options });
 
-      // PIE
-      createChart(document.getElementById('pieChart'), 'pie', {
-        labels: @json($employment_status->keys()),
-        datasets: [{
-          data: @json($employment_status->values()),
-          backgroundColor: ['#60A5FA', '#34D399', '#FBBF24', '#F472B6', '#818CF8']
-        }]
-      }, {
-        plugins: { legend: { labels: { color: textColor } } }
-      });
-
-      // BAR
-      createChart(document.getElementById('barChart'), 'bar', {
-        labels: @json($employment_status->keys()),
-        datasets: [{
-          label: 'Status',
-          data: @json($employment_status->values()),
-          backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EC4899', '#8B5CF6']
-        }]
-      }, {
-        scales: {
-          x: { ticks: { color: textColor }, grid: { color: gridColor } },
-          y: { beginAtZero: true, ticks: { color: textColor }, grid: { color: gridColor } }
-        },
-        plugins: { legend: { labels: { color: textColor } } }
-      });
-
-      // LINE
-      createChart(document.getElementById('lineChart'), 'line', {
-        labels: @json($graduationChart->keys()),
-        datasets: [{
-          label: 'Jumlah Alumni per Angkatan',
-          data: @json($graduationChart->values()),
-          borderColor: '#3B82F6',
-          backgroundColor: 'rgba(59,130,246,0.1)',
-          fill: true,
-          tension: 0.4
-        }]
-      }, {
-        scales: {
-          x: { ticks: { color: textColor }, grid: { color: gridColor } },
-          y: { beginAtZero: true, ticks: { color: textColor }, grid: { color: gridColor } }
-        },
-        plugins: { legend: { labels: { color: textColor } } }
-      });
-
-      // RADAR
-      createChart(document.getElementById('radarChart'), 'radar', {
-        labels: @json($graduationChart->keys()),
-        datasets: [{
-          label: 'Alumni per Jurusan',
-          data: @json($graduationChart->values()),
-          borderColor: '#3B82F6',
-          backgroundColor: 'rgba(59,130,246,0.2)',
-          fill: true
-        }]
-      }, {
-        plugins: { legend: { labels: { color: textColor } } },
-        scales: {
-          r: {
-            pointLabels: { color: textColor, font: { size: 13 } },
-            ticks: { color: textColor },
-            grid: { color: 'rgba(0,0,0,0.1)' }
+        createChart(document.getElementById('pieChart'), 'pie', {
+          labels: @json($statusAlumniLabels),
+          datasets: [{
+            data: @json($statusAlumniData),
+            backgroundColor: [
+              '#3B82F6',
+              '#10B981',
+              '#FBBF24',
+              '#EC4899',
+              '#8B5CF6'
+            ],
+            borderColor: '#fff',
+            borderWidth: 2
+          }]
+        }, {
+          plugins: {
+            legend: { labels: { color: textColor } },
+            datalabels: {
+              color: '#fff',
+              font: { weight: 'bold', size: 14 },
+              textStrokeColor: 'rgba(0,0,0,0.6)',
+              textStrokeWidth: 2,
+              formatter: (value, context) => {
+                const dataArr = context.chart.data.datasets[0].data;
+                const sum = dataArr.reduce((a,b) => a+b, 0);
+                const percentage = (value / sum * 100).toFixed(1) + '%';
+                return percentage;
+              }
+            }
           }
-        }
-      });
-
-      // EXPORT CHART
-      const { jsPDF } = window.jspdf;
-      const downloadChart = (btnId, canvasId, title, filename) => {
-        document.getElementById(btnId).addEventListener('click', () => {
-          const canvas = document.getElementById(canvasId);
-          const pdf = new jsPDF();
-          pdf.text(title, 10, 10);
-          pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, 20, 180, 160);
-          pdf.save(filename);
         });
-      };
 
-      downloadChart('downloadPieChart', 'pieChart', 'Status Alumni', 'pie_chart.pdf');
-      downloadChart('downloadBarChart', 'barChart', 'Alumni per Status Pekerjaan', 'bar_chart.pdf');
-      downloadChart('downloadLineChart', 'lineChart', 'Perkembangan Alumni', 'line_chart.pdf');
-      downloadChart('downloadRadarChart', 'radarChart', 'Perbandingan Jurusan', 'radar_chart.pdf');
-    });
-  </script>
+        const totalAlumni = @json($statusAlumniData).reduce((a,b) => a + b, 0);
+
+        createChart(document.getElementById('barChart'), 'bar', {
+          labels: @json($statusAlumniLabels),
+          datasets: [{
+            label: 'Total Alumni: ' + totalAlumni,
+            data: @json($statusAlumniData),
+            backgroundColor: [
+              'rgba(59, 130, 246, 0.8)',
+              'rgba(16, 185, 129, 0.8)',
+              'rgba(245, 158, 11, 0.8)',
+              'rgba(236, 72, 153, 0.8)',
+              'rgba(139, 92, 246, 0.8)'
+            ],
+            borderRadius: 6
+          }]
+        }, {
+          scales: {
+            x: { ticks: { color: textColor }, grid: { color: gridColor } },
+            y: { beginAtZero: true, ticks: { color: textColor }, grid: { color: gridColor } }
+          },
+          plugins: {
+            legend: { labels: { color: textColor } },
+            datalabels: {
+              color: '#fff',
+              font: { weight: 'bold', size: 16 },
+              textStrokeColor: 'rgba(0,0,0,0.6)',
+              textStrokeWidth: 3
+            }
+          }
+        });
+
+        createChart(document.getElementById('lineChart'), 'line', {
+          labels: @json($angkatanLabels),
+          datasets: [{
+            label: 'Jumlah Alumni per Angkatan',
+            data: @json($angkatanData),
+            borderColor: '#2563EB',
+            backgroundColor: 'rgba(37, 99, 235, 0.2)',
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#2563EB',
+            pointRadius: 5
+          }]
+        }, {
+          scales: {
+            x: { ticks: { color: textColor }, grid: { color: gridColor } },
+            y: { beginAtZero: true, ticks: { color: textColor }, grid: { color: gridColor } }
+          },
+          plugins: {
+            legend: { labels: { color: textColor } },
+            datalabels: {
+              color: '#2563EB',
+              anchor: 'end',
+              align: 'top',
+              font: { weight: 'bold', size: 12 },
+              formatter: (value) => value
+            }
+          }
+        });
+
+        createChart(document.getElementById('radarChart'), 'radar', {
+          labels: @json($waktuTungguLabels),
+          datasets: [{
+            label: 'Jumlah Alumni',
+            data: @json($waktuTungguData),
+            borderColor: '#DB2777',
+            backgroundColor: 'rgba(219, 39, 119, 0.3)', 
+            fill: true
+          }]
+        }, {
+          plugins: {
+            legend: { labels: { color: textColor } },
+            datalabels: {
+              color: '#2563EB',
+              font: { weight: 'bold', size: 12 },
+              anchor: 'end',
+              align: 'start',
+              offset: 8,
+                formatter: (value, context) => {
+                  const label = context.chart.data.labels[context.dataIndex];//dari sini value
+                  return `${label} = ${value} orang`; //'value' adalah elemen pada array 'data' di datasets[0], sesuai dengan indeks (context.dataIndex)
+                      //context.dataIndex = 1
+                      // label = data.labels[1] = '1-3 bulan'
+                      // value = data.datasets[0].data[1] = 25
+                }
+            }
+          },
+          scales: {
+            r: {
+              pointLabels: { color: textColor, font: { size: 15 } },
+              ticks: {
+                beginAtZero: true,
+                stepSize: 1,
+                precision: 0,
+                color: textColor
+              },
+              grid: { color: 'rgba(0,0,0,0.1)' }
+            }
+          }
+        });
+
+        //mengolah pdf
+      const { jsPDF } = window.jspdf;
+    const downloadChart = (btnId, canvasId, title, filename) => {
+      document.getElementById(btnId).addEventListener('click', () => {
+        const canvas = document.getElementById(canvasId);
+        const pdf = new jsPDF();
+
+        const today = new Date().toLocaleDateString('id-ID', {
+          day: '2-digit', month: 'long', year: 'numeric'
+        });
+
+        pdf.setFontSize(16);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(title, 10, 15);
+
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`Tanggal: ${today}`, 10, 22);
+
+        pdf.setDrawColor(0);
+        pdf.line(10, 25, 200, 25);
+
+        const image = canvas.toDataURL('image/png');
+        pdf.addImage(image, 'PNG', 10, 30, 180, 130);
+
+        pdf.setFontSize(8);
+        pdf.setTextColor(150);
+        pdf.text('Download dari Sistem Tracer Alumni', 10, 285);
+
+        pdf.save(filename);
+      });
+    };
+
+    downloadChart('downloadPieChart', 'pieChart', 'Status Alumni', 'pie_chart.pdf');
+    downloadChart('downloadBarChart', 'barChart', 'Distribusi Alumni Berdasarkan Pekerjaan', 'bar_chart.pdf');
+    downloadChart('downloadLineChart', 'lineChart', 'Jumlah Alumni per Angkatan', 'line_chart.pdf');
+    downloadChart('downloadRadarChart', 'radarChart', 'Waktu Tunggu Alumni Mendapatkan Pekerjaan', 'radar_chart.pdf');
+
+      });
+</script>
+
 </x-app-layout>

@@ -52,6 +52,10 @@
 
             <!-- Bisa ditambah halaman di sini -->
             <!-- <div class="step hidden" id="step3">...</div> -->
+            <div class="step hidden" id="step3">
+                @include('alumni.partials.pekerjaan')
+            </div>
+
 
             <!-- Progress dan tombol -->
             <div class="flex items-center justify-between mt-4">

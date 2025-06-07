@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Submission;
 use App\Http\Controllers\Controller;
 use App\Models\Question;
+use App\Models\WaktuTungguKerja;
 use App\Models\AlumniAnswer;
 use App\Models\Alumni;
 use Illuminate\Http\Request;
@@ -11,25 +12,6 @@ use Illuminate\Http\Request;
 class AnswerController extends Controller
 {
     
-    // public function create(Question $question)
-    // {
-    //     return view('admin.answers.create', compact('question'));
-    // }
-
-    // public function store(Request $request, Question $question)
-    // {
-    //     $validated = $request->validate([
-    //         'answer_text' => 'required|string',
-    //     ]);
-
-    //     AlumniAnswer::create([
-    //         'question_id' => $question->id,
-    //         'answer_text' => $validated['answer_text'],
-    //     ]);
-
-    //     return redirect()->route('admin.answers.index', $question)
-    //                      ->with('success', 'Jawaban berhasil ditambahkan!');
-    // }
 
     public function destroyBySubmission($submissionId)
     {
@@ -41,8 +23,94 @@ class AnswerController extends Controller
         return redirect()->back()->with('success', 'Data alumni dan jawabannya berhasil dihapus.');
     }
 
+//     public function showAnswers()
+// {
+//     $keyword = request('keyword');
+//     $withQuestions = !empty($keyword);
 
-    public function showAnswers()
+//     $questionIds = [];
+//     $questions = collect();
+
+//     if ($withQuestions) {
+//         $questions = Question::where('question_text', 'like', '%' . $keyword . '%')->get();
+//         $questionIds = $questions->pluck('id')->toArray();
+//     } else {
+//         $questions = Question::all();
+//     }
+
+//     $submissionQuery = Submission::with(['alumni', 'alumniAnswers.question']);
+
+//     if ($withQuestions && count($questionIds) > 0) {
+//         $submissionQuery->whereHas('alumniAnswers', function ($q) use ($questionIds) {
+//             $q->whereIn('question_id', $questionIds)
+//               ->whereNotNull('answer')
+//               ->where('answer', '!=', '');
+//         });
+//     }
+
+//     if ($startDate = request('start_date')) {
+//         $submissionQuery->whereDate('created_at', $startDate);
+//     }
+
+//     if (($graduationYear = request('graduation_year')) && $graduationYear !== 'all') {
+//         $submissionQuery->whereHas('alumni', function ($q) use ($graduationYear) {
+//             $q->where('tahun_lulus', $graduationYear);
+//         });
+//     }
+
+//     if (($status = request('status')) && $status !== 'all') {
+//         $submissionQuery->whereHas('alumni', function ($q) use ($status) {
+//             $q->where('status_saat_ini', $status);
+//         });
+//     }
+
+//     $submissions = $submissionQuery->paginate(10)->withQueryString();
+
+//     // Susun data jawaban per alumni
+//     $alumniRows = [];
+
+//     foreach ($submissions as $submission) {
+//         $alumni = $submission->alumni;
+
+//         $row = [
+//             'submission_id' => $submission->id,
+//             'created_at' => $submission->created_at,
+//             'alumni' => [
+//                 'npm' => $alumni->npm,
+//                 'nama_mahasiswa' => $alumni->nama_mahasiswa,
+//                 'email' => $alumni->email,
+//                 'nomor_telepon' => $alumni->nomor_telepon,
+//                 'status_saat_ini' => $alumni->status_saat_ini,
+//                 'tahun_lulus' => $alumni->tahun_lulus,
+//             ],
+//         ];
+
+//         foreach ($questions as $q) {
+//             $row[$q->question_text] = '-';
+//         }
+
+//         foreach ($submission->alumniAnswers as $answer) {
+//             $row[$answer->question->question_text] = $answer->answer;
+//         }
+
+//         $alumniRows[] = $row;
+//     }
+
+//     // Sesuaikan kolom filter
+//     $graduationYears = Alumni::pluck('tahun_lulus')->unique()->sort()->values();
+//     $employmentStatuses = Alumni::pluck('status_saat_ini')->unique()->sort()->values();
+
+//     return view('admin.alumni_answers.index', [
+//         'questions' => $questions,
+//         'submissions' => $submissions,
+//         'alumniRows' => $alumniRows,
+//         'graduationYears' => $graduationYears,
+//         'employmentStatuses' => $employmentStatuses,
+//         'withQuestions' => $withQuestions,
+//     ]);
+// }
+
+public function showAnswers()
 {
     $keyword = request('keyword');
     $withQuestions = !empty($keyword);
@@ -57,8 +125,9 @@ class AnswerController extends Controller
         $questions = Question::all();
     }
 
-    $submissionQuery = Submission::with(['alumni', 'alumniAnswers.question']);
+    $submissionQuery = Submission::with(['alumni','alumni.WaktuTungguKerja', 'alumniAnswers.question']);
 
+    //kata kunci
     if ($withQuestions && count($questionIds) > 0) {
         $submissionQuery->whereHas('alumniAnswers', function ($q) use ($questionIds) {
             $q->whereIn('question_id', $questionIds)
@@ -67,32 +136,38 @@ class AnswerController extends Controller
         });
     }
 
+    //waktu pengisian
     if ($startDate = request('start_date')) {
         $submissionQuery->whereDate('created_at', $startDate);
     }
 
-    if (($graduationYear = request('graduation_year')) && $graduationYear !== 'all') {
-        $submissionQuery->whereHas('alumni', function ($q) use ($graduationYear) {
-            $q->where('graduation_year', $graduationYear);
+    //tahun lulus
+    if (($tahunlulus = request('tahun_lulus')) && $tahunlulus !== 'all') {
+        $submissionQuery->whereHas('alumni', function ($q) use ($tahunlulus) {
+            $q->where('tahun_lulus', $tahunlulus);
         });
     }
 
-    if (($status = request('status')) && $status !== 'all') {
-        $submissionQuery->whereHas('alumni', function ($q) use ($status) {
-            $q->where('employment_status', $status);
+    //status kerja
+    if (($statuskerja = request('status_kerja')) && $statuskerja !== 'all') {
+        $submissionQuery->whereHas('alumni', function ($q) use ($statuskerja) {
+            $q->where('status_saat_ini', $statuskerja);
         });
     }
 
     $submissions = $submissionQuery->paginate(10)->withQueryString();
 
-    //nyusundata jawaban per alumni
     $alumniRows = [];
 
     foreach ($submissions as $submission) {
+        $alumni = $submission->alumni;
+
         $row = [
             'submission_id' => $submission->id,
             'created_at' => $submission->created_at,
-            'alumni' => $submission->alumni,
+            'alumni' => $alumni,
+            'waktu_tunggu' => $alumni->waktuTungguKerja,
+
         ];
 
         foreach ($questions as $q) {
@@ -100,14 +175,17 @@ class AnswerController extends Controller
         }
 
         foreach ($submission->alumniAnswers as $answer) {
-            $row[$answer->question->question_text] = $answer->answer;
+            if ($answer->question) {
+                $row[$answer->question->question_text] = $answer->answer;
+            }
         }
 
         $alumniRows[] = $row;
     }
 
-    $graduationYears = Alumni::pluck('graduation_year')->unique()->sort()->values();
-    $employmentStatuses = Alumni::pluck('employment_status')->unique()->sort()->values();
+    // Ambil data unik dan sorting sesuai atribut schema
+    $graduationYears = Alumni::pluck('tahun_lulus')->unique()->sort()->values();
+    $employmentStatuses = Alumni::pluck('status_saat_ini')->unique()->sort()->values();
 
     return view('admin.alumni_answers.index', [
         'questions' => $questions,
@@ -121,34 +199,81 @@ class AnswerController extends Controller
 
 
 
-public function detailJawaban($submissionId)
+ public function detailJawaban($submissionId)
 {
-    $submission = Submission::with(['alumni', 'alumniAnswers.question'])->findOrFail($submissionId);
+    try {
+        $submission = Submission::with([
+            'alumni',
+            'alumniAnswers.question',
+            'alumni.waktuTungguKerja',
+            'alumni.jenisPerusahaan',
+            'alumni.keeratanStudiKerja',
+            'alumni.kompetensiLulus',
+            'alumni.kompetensiKerja',
+        ])->findOrFail($submissionId);
 
-    $alumni = $submission->alumni;
-    return response()->json([
-        'submission_id' => $submission->id,
-        'created_at' => $submission->created_at,
-        'alumni' => [
-            'name' => $alumni->name,
-            'email' => $alumni->email,
-            'major' => $alumni->major,
-            'graduation_year' => $alumni->graduation_year,
-            'employment_status' => $alumni->employment_status,
-            'mounth_waiting' => $alumni->mounth_waiting,
-            'type_company' => $alumni->type_company,
-            'closeness_workfield' => $alumni->closeness_workfield,
-            'phone_number' => $alumni->phone_number,
-            'address' => $alumni->address
-        ],
-        //mapp jawaban
-        'alumniAnswers' => $submission->alumniAnswers->map(function ($answer) {
-            return [
-                'question' => $answer->question->question_text, 
-                'answer' => $answer->answer  
-            ];
-        })->toArray()
-    ]);
+        $alumni = $submission->alumni;
+
+       return response()->json([
+    'submission_id' => $submission->id,
+    'created_at' => $submission->created_at,
+    'alumni' => [
+        'tahun_lulus' => $alumni->tahun_lulus,
+        'npm' => $alumni->npm,
+        'nama_mahasiswa' => $alumni->nama_mahasiswa,
+        'nik' => $alumni->nik,
+        'tanggal_lahir' => $alumni->tanggal_lahir,
+        'email' => $alumni->email,
+        'nomor_telepon' => $alumni->nomor_telepon,
+        'npwp' => $alumni->npwp,
+        'nama_dosen_pembimbing' => $alumni->nama_dosen_pembimbing,
+        'sumber_pembiayaan_kuliah' => $alumni->sumber_pembiayaan_kuliah,
+        'status_saat_ini' => $alumni->status_saat_ini,
+        'alamat' => $alumni->alamat,
+    ],
+    'waktu_kerja' => [
+        'waktu_tunggu_kerja' => $alumni->waktuTungguKerja->waktu_tunggu_bulan ?? '-',
+    ],
+    'jenis_perusahaan' => [
+        'jenis_perusahaan' => $alumni->jenisPerusahaan->jenis_perusahaan ?? '-',
+    ],
+    'keeratan_studi_kerja' => [
+        'keeratan_studi_kerja' => $alumni->keeratanStudiKerja->keeratan_bidang_studi ?? '-',
+    ],
+    'kompetensiLulus' => [   // key ini harus sama di frontend
+        'etika' => optional($alumni->kompetensiLulus)->etika,
+        'keahlian_bidang_ilmu' => optional($alumni->kompetensiLulus)->keahlian_bidang_ilmu,
+        'bahasa_inggris' => optional($alumni->kompetensiLulus)->bahasa_inggris,
+        'penggunaan_teknologi_informasi' => optional($alumni->kompetensiLulus)->penggunaan_teknologi_informasi,
+        'komunikasi' => optional($alumni->kompetensiLulus)->komunikasi,
+        'kerjasama_tim' => optional($alumni->kompetensiLulus)->kerjasama_tim,
+        'pengembangan_diri' => optional($alumni->kompetensiLulus)->pengembangan_diri,
+    ],
+    'kompetensiKerja' => [    // key ini harus sama di frontend
+        'etika' => optional($alumni->kompetensiKerja)->etika,
+        'keahlian_bidang_ilmu' => optional($alumni->kompetensiKerja)->keahlian_bidang_ilmu,
+        'bahasa_inggris' => optional($alumni->kompetensiKerja)->bahasa_inggris,
+        'penggunaan_teknologi_informasi' => optional($alumni->kompetensiKerja)->penggunaan_teknologi_informasi,
+        'komunikasi' => optional($alumni->kompetensiKerja)->komunikasi,
+        'kerjasama_tim' => optional($alumni->kompetensiKerja)->kerjasama_tim,
+        'pengembangan_diri' => optional($alumni->kompetensiKerja)->pengembangan_diri,
+    ],
+    'alumniAnswers' => $submission->alumniAnswers->map(function ($answer) {
+        return [
+            'question' => $answer->question->question_text ?? 'Pertanyaan tidak ditemukan',
+            'answer' => $answer->answer,
+        ];
+    })->toArray(),
+]);
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return response()->json([
+            'error' => 'Submission dengan ID ' . $submissionId . ' tidak ditemukan.'
+        ], 404);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Terjadi kesalahan server: ' . $e->getMessage()
+        ], 500);
+    }
 }
 
 

@@ -82,14 +82,14 @@
 
                     {{-- Tahun Lulus --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tahun Lulus</label>
+                        <label name="tahun_lulus" class="block text-sm font-medium text-gray-700 mb-1">Tahun Lulus</label>
                         <select
-                            name="graduation_year"
+                            name="tahun_lulus"
                             class="w-full px-4 py-2 rounded-lg border border-gray-300 shadow-sm text-gray-800 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                         >
                             <option value="all">Semua</option>
                             @foreach ($graduationYears as $year)
-                                <option value="{{ $year }}" {{ request('graduation_year') == $year ? 'selected' : '' }}>
+                                <option value="{{ $year }}" {{ request('tahun_lulus') == $year ? 'selected' : '' }}>
                                     {{ $year }}
                                 </option>
                             @endforeach
@@ -98,15 +98,15 @@
 
                     {{-- Status Pekerjaan --}}
                     <div>
-                        <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status Pekerjaan</label>
+                        <label for="status_kerja" class="block text-sm font-medium text-gray-700 mb-1">Status Pekerjaan</label>
                         <select
-                            name="status"
+                            name="status_kerja"
                             id="status"
                             class="w-full px-4 py-2 rounded-lg border border-gray-300 shadow-sm text-gray-800 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                         >
                             <option value="all">Semua</option>
                             @foreach ($employmentStatuses as $status)
-                                <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
+                                <option value="{{ $status }}" {{ request('status_kerja') == $status ? 'selected' : '' }}>
                                     {{ $status }}
                                 </option>
                             @endforeach
@@ -164,7 +164,7 @@
 
                 <!-- Footer -->
                 <div class="mt-6 pt-4 border-t border-gray-200 text-right">
-                    <button onclick="closeModal()" class="px-5 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition">Tutup</button>
+                    <button onclick="closeModal()" class="px-5 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 transition">Tutup</button>
                 </div>
             </div>
         </div>
@@ -205,7 +205,7 @@
                                 <th class="px-4 py-3 font-semibold whitespace-nowrap">ID</th>
                                 <th class="px-4 py-3 font-semibold whitespace-nowrap">Nama</th>
                                 <th class="px-4 py-3 font-semibold whitespace-nowrap">Email</th>
-                                <th class="px-4 py-3 font-semibold whitespace-nowrap">Jurusan</th>
+                                <th class="px-4 py-3 font-semibold whitespace-nowrap">NPM</th>
                                 <th class="px-4 py-3 font-semibold whitespace-nowrap">Tahun <br> Lulus</th>
                                 <th class="px-4 py-3 font-semibold whitespace-nowrap">Status Kerja</th>
                                 <th class="px-4 py-3 font-semibold whitespace-nowrap">Waktu tunggu kerja <br> setelah lulus</th>
@@ -232,13 +232,13 @@
                         <tbody class="divide-y divide-gray-200 bg-white" id="dataRows">
                             @foreach ($alumniRows as $index => $row)
                                 <tr class="hover:bg-gray-100 text-left">
-                                    <td class="px-4 py-2 whitespace-nowrap">{{ ($submissions->currentPage() - 1) * $submissions->perPage() + $index + 1 }}</td>
-                                    <td class="px-4 py-2 whitespace-nowrap">{{ $row['alumni']->name ?? '-' }}</td>
-                                    <td class="px-4 py-2 whitespace-nowrap">{{ $row['alumni']->email ?? '-' }}</td>
-                                    <td class="px-4 py-2 whitespace-nowrap">{{ $row['alumni']->major ?? '-' }}</td>
-                                    <td class="px-4 py-2 whitespace-nowrap">{{ $row['alumni']->graduation_year ?? '-' }}</td>
-                                    <td class="px-4 py-2 whitespace-nowrap">{{ $row['alumni']->employment_status ?? '-' }}</td>                          
-                                    <td class="px-4 py-2 whitespace-nowrap">{{ $row['alumni']->mounth_waiting ?? '-' }}</td>
+                                         <td class="px-4 py-2 whitespace-nowrap">{{ ($row['alumni'])->id ?? '-' }}</td>
+                                        <td class="px-4 py-2 whitespace-nowrap">{{ ($row['alumni'])->nama_mahasiswa ?? '-' }}</td>
+                                        <td class="px-4 py-2 whitespace-nowrap">{{ ($row['alumni'])->email ?? '-' }}</td>
+                                        <td class="px-4 py-2 whitespace-nowrap">{{ ($row['alumni'])->npm ?? '-' }}</td>
+                                        <td class="px-4 py-2 whitespace-nowrap">{{ ($row['alumni'])->tahun_lulus ?? '-' }}</td>
+                                        <td class="px-4 py-2 whitespace-nowrap">{{ ($row['alumni'])->status_saat_ini ?? '-' }}</td>
+                                        <td class="px-4 py-2 whitespace-nowrap">{{ $row['waktu_tunggu']->waktu_tunggu_bulan ?? '-' }} </td>
 
                                     @foreach ($questions->take(4) as $question)
                                         <td data-question @if ($withQuestions) data-question-matched @endif class="px-4 py-2 whitespace-nowrap">
@@ -327,14 +327,13 @@
             const form = document.querySelector('#filterSidebar form');
 
             if (!form) return;
-
             // Reset semua input dan select
             const inputs = form.querySelectorAll('input, select');
             inputs.forEach(input => {
                 if (input.tagName === 'INPUT' && (input.type === 'text' || input.type === 'date')) {
                     input.value = '';
                 } else if (input.tagName === 'SELECT') {
-                    input.selectedIndex = 0; // default ke opsi pertama (biasanya 'Semua')
+                    input.selectedIndex = 0;
                 }
             });
 
@@ -352,84 +351,226 @@
                 matchingCols.forEach(el => el.classList.remove('hidden'));
             }
         });
-    //ambil semua data modal
-    const loadDetails = async (submissionId) => {   
-        const modal = document.getElementById('detailModal');
-        const modalContent = document.getElementById('modalContent');
-        const response = await fetch(`/admin/alumni_answers/detail/${submissionId}`);
-        const textResponse = await response.text();
 
-        // console.log(textResponse);
+  const loadDetails = async (submissionId) => {
+    const modal = document.getElementById('detailModal');
+    const modalContent = document.getElementById('modalContent');
+    const response = await fetch(`/admin/alumni_answers/detail/${submissionId}`);
+    const textResponse = await response.text();
 
-        let data;
-        try {
-            data = JSON.parse(textResponse);
-            // console.log(data);
-        } catch (error) {
-            console.error('Gagal parse JSON:', error);
-            return;
-        }
-
-        const alumniLabels = {
-            name: 'Nama',
-            email: 'Email',
-            major: 'Jurusan',
-            graduation_year: 'Angkatan',
-            employment_status: 'Status Pekerjaan',
-            mounth_waiting: 'Setelah lulus menunggu kerja berapa bulan',
-            type_company: 'Tipe Perusahaan',
-            closeness_workfield: 'Jarak kerja',
-            phone_number: 'Nomor Telepon',
-            address: 'Alamat'
-        };
-
-        let html = `  
-            <div class="overflow-y-auto max-h-[60vh] pr-2 custom-scrollbar">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="border-b border-gray-300 dark:border-gray-200 bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100">
-                            <th class="py-2 px-3 font-semibold text-center text-sm border-r border-gray-300 dark:border-gray-600 w-1/3">PERTANYAAN</th>
-                            <th class="py-2 px-3 text-center text-sm">JAWABAN</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                            `;
-        if (data.alumni && typeof data.alumni === 'object') {
-            Object.entries(alumniLabels).forEach(([field, label]) => {
-                html += `
-                    <tr class="border-b border-gray-300 dark:border-gray-600">
-                        <th class="py-2 px-3 font-medium text-lg border-r border-gray-300 dark:border-gray-600 align-top">${label}</th>
-                        <td class="py-2 px-3 text-lg whitespace-pre-line">${data.alumni[field] || '-'}</td>
-                    </tr>
-                `;
-            });
-        }
-
-        if (Array.isArray(data.alumniAnswers)) {
-            data.alumniAnswers.forEach(({ question, answer }) => {
-                html += `
-                    <tr class="border-b border-gray-300 dark:border-gray-600">
-                        <th class="py-2 px-3 font-medium text-lg border-r border-gray-300 dark:border-gray-600 align-top">${question}</th>
-                        <td class="py-2 px-3 text-lg whitespace-pre-line">${answer || '-'}</td>
-                    </tr>
-                `;
-            });
-        }
-
-        html += `
-                    </tbody>
-                </table>
-            </div>
-        `;
-        modalContent.innerHTML = html;
-
-        modal.classList.remove('hidden', 'pointer-events-none', 'opacity-0');
-        modal.classList.add('flex');
-        setTimeout(() => {
-            modal.classList.remove('opacity-0');
-            modal.classList.add('opacity-100');
-        }, 50);
+    let data;
+    try {
+        data = JSON.parse(textResponse);
+    } catch (error) {
+        console.error('Gagal parse JSON:', error);
+        return;
     }
+
+    const alumniLabels = {
+        nama_mahasiswa: 'Nama Mahasiswa',
+        nik: 'NIK',
+        email: 'Email',
+        npm: 'NPM',
+        tahun_lulus: 'Tahun Lulus',
+        tanggal_lahir: 'Tanggal Lahir',
+        nomor_telepon: 'Nomor Telepon',
+        npwp: 'NPWP',
+        nama_dosen_pembimbing: 'Dosen Pembimbing',
+        sumber_pembiayaan_kuliah: 'Sumber Pembiayaan Kuliah',
+        status_saat_ini: 'Status Saat Ini',
+    };
+
+    const waktuTungguLabels = {
+        waktu_tunggu_kerja: 'Waktu Tunggu Kerja (bulan)', // tambahkan koma
+    };
+
+    const jenisPerusahaanLabels = {
+        jenis_perusahaan: 'Jenis Perusahaan',
+    };
+
+    const keeratanStudiKerjaLabels = {
+        keeratan_studi_kerja: 'Keeratan Studi dengan Pekerjaan',
+    };
+
+    const kompetensiLulusLabels = {
+        etika: 'Etika',
+        keahlian_bidang_ilmu: 'Keahlian Berdasarkan Bidang Ilmu',
+        bahasa_inggris: 'Bahasa Inggris',
+        penggunaan_teknologi_informasi: 'Penggunaan Teknologi Informasi',
+        komunikasi: 'Komunikasi',
+        kerjasama_tim: 'Kerja Sama Tim',
+        pengembangan_diri: 'Pengembangan Diri',
+    };
+
+    const kompetensiKerjaLabels = {
+        etika: 'Etika',
+        keahlian_bidang_ilmu: 'Keahlian Berdasarkan Bidang Ilmu',
+        bahasa_inggris: 'Bahasa Inggris',
+        penggunaan_teknologi_informasi: 'Penggunaan Teknologi Informasi',
+        komunikasi: 'Komunikasi',
+        kerjasama_tim: 'Kerja Sama Tim',
+        pengembangan_diri: 'Pengembangan Diri',
+    };
+
+    let html = `
+        <div class="overflow-y-auto max-h-[60vh] pr-2 custom-scrollbar">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-gray-300 dark:border-gray-200 bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100">
+                        <th class="py-2 px-3 font-semibold text-center text-sm border-r border-gray-300 dark:border-gray-600 w-1/3">PERTANYAAN</th>
+                        <th class="py-2 px-3 text-center text-sm">JAWABAN</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    // Data Alumni
+    if (data.alumni && typeof data.alumni === 'object') {
+        Object.entries(alumniLabels).forEach(([field, label]) => {
+            html += `
+                <tr class="border-b border-gray-300 dark:border-gray-600">
+                    <th class="py-2 px-3 font-medium text-lg border-r border-gray-300 dark:border-gray-600 align-top">${label}</th>
+                    <td class="py-2 px-3 text-lg whitespace-pre-line">${data.alumni[field] ?? '-'}</td>
+                </tr>
+            `;
+        });
+    } else {
+        html += `
+            <tr>
+                <td colspan="2" class="py-4 px-3 text-center text-red-600 italic">Data alumni belum tersedia</td>
+            </tr>
+        `;
+    }
+
+    // Waktu Tunggu Kerja
+    html += `<tr class="bg-gray-100"><th colspan="2" class="py-2 px-3 font-bold text-blue-700">Waktu Tunggu Kerja</th></tr>`;
+    if (data.waktu_kerja && typeof data.waktu_kerja === 'object') {
+        Object.entries(waktuTungguLabels).forEach(([field, label]) => {
+            html += `
+                <tr class="border-b border-gray-300 dark:border-gray-600">
+                    <th class="py-2 px-3 font-medium text-lg border-r border-gray-300 dark:border-gray-600 align-top">${label}</th>
+                    <td class="py-2 px-3 text-lg whitespace-pre-line">${data.waktu_kerja[field] ?? '-'}</td>
+                </tr>
+            `;
+        });
+    } else {
+        html += `
+            <tr>
+                <td colspan="2" class="py-4 px-3 text-center text-red-600 italic">Data waktu tunggu kerja belum tersedia</td>
+            </tr>
+        `;
+    }
+
+    // Jenis Perusahaan
+    html += `<tr class="bg-gray-100"><th colspan="2" class="py-2 px-3 font-bold text-blue-700">Jenis Perusahaan</th></tr>`;
+    if (data.jenis_perusahaan && typeof data.jenis_perusahaan === 'object') {
+        Object.entries(jenisPerusahaanLabels).forEach(([field, label]) => {
+            html += `
+                <tr class="border-b border-gray-300 dark:border-gray-600">
+                    <th class="py-2 px-3 font-medium text-lg border-r border-gray-300 dark:border-gray-600 align-top">${label}</th>
+                    <td class="py-2 px-3 text-lg whitespace-pre-line">${data.jenis_perusahaan[field] ?? '-'}</td>
+                </tr>
+            `;
+        });
+    } else {
+        html += `
+            <tr>
+                <td colspan="2" class="py-4 px-3 text-center text-red-600 italic">Data jenis perusahaan belum tersedia</td>
+            </tr>
+        `;
+    }
+
+    // Keeratan Studi Kerja
+    html += `<tr class="bg-gray-100"><th colspan="2" class="py-2 px-3 font-bold text-blue-700">Keeratan Studi dengan Pekerjaan</th></tr>`;
+    if (data.keeratan_studi_kerja && typeof data.keeratan_studi_kerja === 'object') {
+        Object.entries(keeratanStudiKerjaLabels).forEach(([field, label]) => {
+            html += `
+                <tr class="border-b border-gray-300 dark:border-gray-600">
+                    <th class="py-2 px-3 font-medium text-lg border-r border-gray-300 dark:border-gray-600 align-top">${label}</th>
+                    <td class="py-2 px-3 text-lg whitespace-pre-line">${data.keeratan_studi_kerja[field] ?? '-'}</td>
+                </tr>
+            `;
+        });
+    } else {
+        html += `
+            <tr>
+                <td colspan="2" class="py-4 px-3 text-center text-red-600 italic">Data keeratan studi kerja belum tersedia</td>
+            </tr>
+        `;
+    }
+
+    // Kompetensi Saat Lulus
+    html += `<tr class="bg-gray-100"><th colspan="2" class="py-2 px-3 font-bold text-blue-700">Kompetensi Saat Lulus</th></tr>`;
+    if (data.kompetensiLulus && typeof data.kompetensiLulus === 'object') {
+        Object.entries(kompetensiLulusLabels).forEach(([field, label]) => {
+            html += `
+                <tr class="border-b border-gray-300 dark:border-gray-600">
+                    <th class="py-2 px-3 font-medium text-lg border-r border-gray-300 dark:border-gray-600 align-top">${label}</th>
+                    <td class="py-2 px-3 text-lg whitespace-pre-line">${data.kompetensiLulus[field] ?? '-'}</td>
+                </tr>
+            `;
+        });
+    } else {
+        html += `
+            <tr>
+                <td colspan="2" class="py-4 px-3 text-center text-red-600 italic">Data kompetensi saat lulus belum tersedia</td>
+            </tr>
+        `;
+    }
+
+    // Kompetensi Saat Bekerja
+    html += `<tr class="bg-gray-100"><th colspan="2" class="py-2 px-3 font-bold text-blue-700">Kompetensi Saat Bekerja</th></tr>`;
+    if (data.kompetensiKerja && typeof data.kompetensiKerja === 'object') {
+        Object.entries(kompetensiKerjaLabels).forEach(([field, label]) => {
+            html += `
+                <tr class="border-b border-gray-300 dark:border-gray-600">
+                    <th class="py-2 px-3 font-medium text-lg border-r border-gray-300 dark:border-gray-600 align-top">${label}</th>
+                    <td class="py-2 px-3 text-lg whitespace-pre-line">${data.kompetensiKerja[field] ?? '-'}</td>
+                </tr>
+            `;
+        });
+    } else {
+        html += `
+            <tr>
+                <td colspan="2" class="py-4 px-3 text-center text-red-600 italic">Data kompetensi saat bekerja belum tersedia</td>
+            </tr>
+        `;
+    }
+
+    // Jawaban Alumni dari Pertanyaan Survei
+    html += `<tr class="bg-gray-100"><th colspan="2" class="py-2 px-3 font-bold text-blue-700">Jawaban Pertanyaan Survei</th></tr>`;
+    if (Array.isArray(data.alumniAnswers) && data.alumniAnswers.length > 0) {
+        data.alumniAnswers.forEach(({ question, answer }) => {
+            html += `
+                <tr class="border-b border-gray-300 dark:border-gray-600">
+                    <th class="py-2 px-3 font-medium text-lg border-r border-gray-300 dark:border-gray-600 align-top">${question}</th>
+                    <td class="py-2 px-3 text-lg whitespace-pre-line">${answer || '-'}</td>
+                </tr>
+            `;
+        });
+    } else {
+        html += `
+            <tr>
+                <td colspan="2" class="bg-red-100 py-4 px-3 text-center text-red-600 italic">Jawaban pertanyaan belum tersedia</td>
+            </tr>
+        `;
+    }
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    modalContent.innerHTML = html;
+    modal.classList.remove('hidden', 'pointer-events-none', 'opacity-0');
+    modal.classList.add('flex');
+    setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        modal.classList.add('opacity-100');
+    }, 50);
+};
+
 
     //     function showAllColumns() {
     //     const table = document.getElementById('dataTable');
