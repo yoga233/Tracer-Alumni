@@ -66,18 +66,18 @@
 
   <div class="w-full bg-[#ffffff] p-9 rounded shadow">
     <label for="nomor_telepon" class="block font-semibold text-base text-gray-700">
-      Nomor Telepon / HP
+      Nomor Telepon / HP <span class="text-red-600">*</span>
     </label>
-    <input type="text" id="nomor_telepon" name="nomor_telepon" value="{{ old('nomor_telepon') }}"
+    <input type="text" id="nomor_telepon" name="nomor_telepon" required value="{{ old('nomor_telepon') }}"
       class="w-1/2 mt-1 border-0 border-b border-gray-300 focus:ring-0 focus:border-orange-600 py-2 bg-transparent text-base">
     @error('nomor_telepon') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
   </div>
 
   <div class="w-full bg-[#ffffff] p-9 rounded shadow">
     <label for="npwp" class="block font-semibold text-base text-gray-700">
-      NPWP
+      NPWP <span class="text-red-600">*</span>
     </label>
-    <input type="text" id="npwp" name="npwp" value="{{ old('npwp') }}"
+    <input type="text" id="npwp" name="npwp" required value="{{ old('npwp') }}"
       class="w-1/2 mt-1 border-0 border-b border-gray-300 focus:ring-0 focus:border-orange-600 py-2 bg-transparent text-base">
     @error('npwp') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
   </div>
@@ -91,7 +91,12 @@
     @error('nama_dosen_pembimbing') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
   </div>
 
-  <div class="w-full bg-[#ffffff] p-9 rounded shadow"> <label class="block font-semibold text-base text-gray-700 mb-2"> Sumber Pembiayaan Kuliah </label> @php $sumberOptions = [ 'Biaya Sendiri / Keluarga', 'Beasiswa ADIK', 'Beasiswa BIDIK MISI', 'Beasiswa PPA', 'Beasiswa AFIRMASI', 'Beasiswa Perusahaan/Swasta', 'Yang lain', ]; $oldValue = old('sumber_pembiayaan_kuliah'); @endphp @foreach ($sumberOptions as $index => $option) <div class="flex items-center mb-2"> <input type="radio" id="sumber_{{ $index }}" name="sumber_pembiayaan_kuliah" value="{{ $option }}" {{ $oldValue === $option ? 'checked' : '' }} class="text-blue-500 focus:ring-blue-500 border-gray-300"> <label for="sumber_{{ $index }}" class="ml-2 text-sm text-gray-700"> {{ $option }} </label> </div> @endforeach <div id="input_lainnya_container" class="{{ $oldValue === 'Yang lain' ? '' : 'hidden' }}"> <label for="sumber_lainnya" class="block mt-2 text-sm text-gray-700"> Tuliskan sumber lainnya: </label> <input type="text" name="sumber_lainnya" id="sumber_lainnya" value="{{ old('sumber_lainnya') }}" class="w-full mt-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"> </div> @error('sumber_pembiayaan_kuliah') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror </div>
+  <div class="w-full bg-[#ffffff] p-9 rounded shadow"> 
+    <label class="block font-semibold text-base text-gray-700 mb-2"> 
+      Sumber Pembiayaan Kuliah <span class="text-red-600">*</span>
+    </label> 
+    @php $sumberOptions = [ 'Biaya Sendiri / Keluarga', 'Beasiswa ADIK', 'Beasiswa BIDIK MISI', 'Beasiswa PPA', 'Beasiswa AFIRMASI', 'Beasiswa Perusahaan/Swasta', 'Yang lain', ]; $oldValue = old('sumber_pembiayaan_kuliah'); @endphp @foreach ($sumberOptions as $index => $option) 
+    <div class="flex items-center mb-2"> <input type="radio" id="sumber_{{ $index }}" name="sumber_pembiayaan_kuliah" value="{{ $option }}" {{ $oldValue === $option ? 'checked' : '' }} class="text-blue-500 focus:ring-blue-500 border-gray-300" required> <label for="sumber_{{ $index }}" class="ml-2 text-sm text-gray-700"> {{ $option }} </label> </div> @endforeach <div id="input_lainnya_container" class="{{ $oldValue === 'Yang lain' ? '' : 'hidden' }}"> <label for="sumber_lainnya" class="block mt-2 text-sm text-gray-700"> Tuliskan sumber lainnya: </label> <input type="text" name="sumber_lainnya" id="sumber_lainnya" value="{{ old('sumber_lainnya') }}" class="w-full mt-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"> </div> @error('sumber_pembiayaan_kuliah') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror </div>
 
 
   <div class="w-full bg-[#ffffff] p-9 rounded shadow">
@@ -172,5 +177,208 @@
 
     // Inisialisasi awal
     updateConditionalQuestions();
+});
+</script>
+<script>
+// Script untuk validasi - letakkan di test.txt
+document.addEventListener('DOMContentLoaded', function () {
+  const nextBtn = document.getElementById('nextBtn');
+  const steps = document.querySelectorAll('.step');
+  let currentStep = 1;
+  let isValidationInProgress = false;
+
+  function validateCurrentStep() {
+    const currentStepElement = steps[currentStep - 1];
+    if (!currentStepElement) return true;
+
+    // Hapus semua pesan error yang ada
+    currentStepElement.querySelectorAll('.validation-error').forEach(e => e.remove());
+
+    let isValid = true;
+    
+    // Validasi input text, email, number, date
+    const inputs = currentStepElement.querySelectorAll('input[required], select[required]');
+    inputs.forEach(input => {
+      if (input.type === 'radio') return; // Skip radio, akan divalidasi terpisah
+      
+      const value = input.value.trim();
+      if (!value) {
+        isValid = false;
+        showError(input, getErrorMessage(input));
+      } else if (input.type === 'email' && !isValidEmail(value)) {
+        isValid = false;
+        showError(input, 'Masukkan alamat email yang valid');
+      } else if (input.pattern && !new RegExp(input.pattern).test(value)) {
+        isValid = false;
+        showError(input, 'Format input tidak sesuai');
+      }
+    });
+
+    // Validasi radio buttons
+    const radioGroups = {};
+    currentStepElement.querySelectorAll('input[type="radio"][required]').forEach(radio => {
+      if (!radioGroups[radio.name]) {
+        radioGroups[radio.name] = [];
+      }
+      radioGroups[radio.name].push(radio);
+    });
+
+    Object.keys(radioGroups).forEach(groupName => {
+      const radios = radioGroups[groupName];
+      const isChecked = radios.some(radio => radio.checked);
+      
+      if (!isChecked) {
+        isValid = false;
+        const lastRadio = radios[radios.length - 1];
+        showError(lastRadio, 'Pilih salah satu opsi');
+      }
+    });
+
+    // Validasi khusus untuk "Yang lain" pada sumber pembiayaan
+    const sumberLainRadio = currentStepElement.querySelector('input[name="sumber_pembiayaan_kuliah"][value="Yang lain"]');
+    if (sumberLainRadio && sumberLainRadio.checked) {
+      const sumberLainnyaInput = currentStepElement.querySelector('#sumber_lainnya');
+      if (sumberLainnyaInput && !sumberLainnyaInput.value.trim()) {
+        isValid = false;
+        showError(sumberLainnyaInput, 'Harap isi sumber pembiayaan lainnya');
+      }
+    }
+
+    return isValid;
+  }
+
+  function showError(element, message) {
+    const errorElement = document.createElement('p');
+    errorElement.className = 'text-red-600 text-sm mt-1 validation-error';
+    errorElement.textContent = message;
+    
+    if (element.type === 'radio') {
+      const radioGroup = document.querySelectorAll(`input[name="${element.name}"]`);
+      const lastRadio = radioGroup[radioGroup.length - 1];
+      lastRadio.closest('.flex').insertAdjacentElement('afterend', errorElement);
+    } else {
+      element.insertAdjacentElement('afterend', errorElement);
+    }
+  }
+
+  function getErrorMessage(input) {
+    switch(input.type) {
+      case 'email':
+        return 'Masukkan alamat email yang valid';
+      case 'date':
+        return 'Masukkan tanggal lahir';
+      case 'number':
+        return 'Masukkan tahun yang valid';
+      default:
+        if (input.name === 'nik') return 'Masukkan NIK/Nomor KTP yang valid (16 digit)';
+        if (input.name === 'npm') return 'Masukkan NPM';
+        if (input.name === 'nama_mahasiswa') return 'Masukkan nama mahasiswa';
+        if (input.name === 'nomor_telepon') return 'Masukkan nomor telepon';
+        if (input.name === 'npwp') return 'Masukkan NPWP';
+        if (input.name === 'nama_dosen_pembimbing') return 'Masukkan nama dosen pembimbing';
+        if (input.tagName === 'SELECT') return 'Pilih salah satu opsi';
+        return 'Field ini wajib diisi';
+    }
+  }
+
+  function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  // HANYA INTERCEPT event nextBtn, tidak mengganti navigasi
+  if (nextBtn) {
+    // HAPUS semua event listener yang ada pada nextBtn
+    const newNextBtn = nextBtn.cloneNode(true);
+    nextBtn.parentNode.replaceChild(newNextBtn, nextBtn);
+    
+    // Tambahkan event listener baru yang hanya untuk validasi
+    newNextBtn.addEventListener('click', function (e) {
+      if (isValidationInProgress) return;
+      isValidationInProgress = true;
+      
+      // Cek apakah ini step pertama (yang perlu validasi)
+      if (currentStep === 1) {
+        const isValid = validateCurrentStep();
+        
+        if (!isValid) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          
+          // Scroll ke error pertama
+          const firstError = document.querySelector('.validation-error');
+          if (firstError) {
+            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          
+          isValidationInProgress = false;
+          return false;
+        }
+      }
+      
+      // Jika valid, biarkan script navigasi normal berjalan
+      currentStep++;
+      isValidationInProgress = false;
+    });
+  }
+
+  // Event listener untuk menghapus error saat user mulai mengetik/memilih
+  document.addEventListener('input', function(e) {
+    if (e.target.matches('input, select')) {
+      const existingError = e.target.parentNode.querySelector('.validation-error');
+      if (existingError) {
+        existingError.remove();
+      }
+    }
+  });
+
+  document.addEventListener('change', function(e) {
+    if (e.target.type === 'radio') {
+      const existingErrors = document.querySelectorAll(`input[name="${e.target.name}"] ~ .validation-error`);
+      existingErrors.forEach(error => error.remove());
+    }
+  });
+
+  // Logic untuk "Yang lain" pada sumber pembiayaan
+  const radios = document.querySelectorAll('input[name="sumber_pembiayaan_kuliah"]');
+  const inputLainnya = document.getElementById('input_lainnya_container');
+
+  radios.forEach(radio => {
+    radio.addEventListener('change', function () {
+      if (this.value === 'Yang lain') {
+        inputLainnya.classList.remove('hidden');
+      } else {
+        inputLainnya.classList.add('hidden');
+        document.getElementById('sumber_lainnya').value = '';
+      }
+    });
+  });
+
+  // Update conditional questions
+  const statusSelect = document.getElementById('status_saat_ini');
+  const step2 = document.getElementById('step2');
+
+  function updateConditionalQuestions() {
+    if (!step2) return;
+    
+    const selectedStatus = statusSelect.value;
+    const allQuestions = step2.querySelectorAll('.conditional-question');
+
+    allQuestions.forEach(q => {
+      const expectedValues = q.dataset.conditionValues?.split(',') ?? [];
+      
+      if (expectedValues.length === 0 || expectedValues.includes(selectedStatus)) {
+        q.classList.remove('hidden');
+      } else {
+        q.classList.add('hidden');
+      }
+    });
+  }
+
+  if (statusSelect) {
+    statusSelect.addEventListener('change', updateConditionalQuestions);
+    updateConditionalQuestions();
+  }
 });
 </script>

@@ -58,33 +58,40 @@
 
 
             <!-- Progress dan tombol -->
-            <div class="flex items-center justify-between mt-4">
-                <div class="flex items-center gap-2 text-sm">
-                <button type="button" id="resetBtn" class="text-yellow-600 hover:underline">Kosongkan formulir</button>
+            <div class="flex items-center justify-between mt-8">
+                <div class="flex items-center gap-4 text-sm">
+                    <button type="button" id="resetBtn" class="text-gray-500 hover:text-red-600 font-normal transition duration-300 ease-in-out focus:outline-none">
+                    Reset Formulir
+                    </button>
                 </div>
-                <div class="flex-1 flex items-center justify-center">
-                <div class="progress-bar-container">
-                    <span>Halaman <span id="currentPage">1</span> dari <span id="totalPages">1</span></span>
-                    <div class="progress-bar">
-                    <div id="progressFill" class="progress-bar-fill"></div>
+
+                <div class="flex-1 flex items-center justify-center gap-4">
+                    <span class="text-gray-600 text-sm">Halaman <span id="currentPage" class="font-semibold text-blue-600">1</span> dari <span id="totalPages">1</span></span>
+                    <div class="w-56 bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                    <div id="progressFill" class="bg-blue-500 h-full rounded-full transition-all duration-500 ease-out" style="width: 10%;"></div>
                     </div>
                 </div>
-                </div>
-                <div class="flex gap-2">
-                <button type="button" id="prevBtn" class="bg-white border border-gray-300 px-4 py-2 rounded text-sm hidden">Sebelumnya</button>
-                <button type="button" id="nextBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded text-sm">Berikutnya</button>
-                <button type="submit"  id="submitBtn" class="submitBtn hidden bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-md shadow-md transition">
-        Kirim Formulir
-    </button>
 
+                <div class="flex gap-3">
+                    <button type="button" id="prevBtn" class="hidden bg-transparent border border-gray-300 text-gray-700 hover:bg-gray-100 hover:text-gray-800 font-medium px-5 py-2 rounded-lg transition duration-300 ease-in-out focus:outline-none">
+                    Sebelumnya
+                    </button>
+                    <button type="button" id="nextBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded-lg transition duration-300 ease-in-out focus:outline-none">
+                    Berikutnya
+                    </button>
+                    <button type="submit" id="submitBtn" class="hidden bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-lg transition duration-300 ease-in-out focus:outline-none">
+                    Kirim Formulir
+                    </button>
                 </div>
-            </div>
+                </div>
             </form>
 
         
     </div>
 
     <script>
+        // Script untuk navigasi - letakkan di test2.txt
+    document.addEventListener('DOMContentLoaded', function() {
         const steps = document.querySelectorAll('.step');
         const totalSteps = steps.length;
         let currentStep = 1;
@@ -101,55 +108,85 @@
         totalPages.textContent = totalSteps;
 
         function showStep(step) {
-        steps.forEach((s, i) => {
-            if (i === step - 1) {
-            s.classList.remove('hidden');
+            steps.forEach((s, i) => {
+                if (i === step - 1) {
+                    s.classList.remove('hidden');
+                } else {
+                    s.classList.add('hidden');
+                }
+            });
+
+            currentPage.textContent = step;
+            const progress = (step / totalSteps) * 100;
+            progressFill.style.width = progress + '%';
+
+            // Update tombol visibility
+            if (step === 1) {
+                prevBtn.classList.add('hidden');
+                nextBtn.classList.remove('hidden');
+                submitBtn.classList.add('hidden');
+            } else if (step === totalSteps) {
+                prevBtn.classList.remove('hidden');
+                nextBtn.classList.add('hidden');
+                submitBtn.classList.remove('hidden');
             } else {
-            s.classList.add('hidden');
+                prevBtn.classList.remove('hidden');
+                nextBtn.classList.remove('hidden');
+                submitBtn.classList.add('hidden');
             }
-        });
-
-        currentPage.textContent = step;
-        const progress = (step / totalSteps) * 100;
-        progressFill.style.width = progress + '%';
-
-        if (step === 1) {
-            prevBtn.classList.add('hidden');
-            nextBtn.classList.remove('hidden');
-            submitBtn.classList.add('hidden');
-        } else if (step === totalSteps) {
-            prevBtn.classList.remove('hidden');
-            nextBtn.classList.add('hidden');
-            submitBtn.classList.remove('hidden');
-        } else {
-            prevBtn.classList.remove('hidden');
-            nextBtn.classList.remove('hidden');
-            submitBtn.classList.add('hidden');
-        }
         }
 
-        nextBtn.addEventListener('click', () => {
-        if (currentStep < totalSteps) {
-            currentStep++;
-            showStep(currentStep);
-        }
-        });
+        // Delay untuk memastikan script validasi sudah selesai
+        setTimeout(() => {
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function(e) {
+                    // Jangan preventDefault di sini, biarkan script validasi yang handle
+                    
+                    // Tunggu sebentar untuk memastikan validasi selesai
+                    setTimeout(() => {
+                        // Cek apakah ada error validasi
+                        const hasErrors = document.querySelector('.validation-error');
+                        
+                        if (!hasErrors && currentStep < totalSteps) {
+                            currentStep++;
+                            showStep(currentStep);
+                        }
+                    }, 50);
+                });
+            }
+        }, 100);
 
-        prevBtn.addEventListener('click', () => {
-        if (currentStep > 1) {
-            currentStep--;
-            showStep(currentStep);
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (currentStep > 1) {
+                    currentStep--;
+                    showStep(currentStep);
+                }
+            });
         }
-        });
 
-        resetBtn.addEventListener('click', () => {
-        form.reset();
-        currentStep = 1;
-        showStep(currentStep);
-        });
+        if (resetBtn) {
+            resetBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                form.reset();
+                currentStep = 1;
+                showStep(currentStep);
+                
+                // Hapus semua error messages
+                document.querySelectorAll('.validation-error').forEach(e => e.remove());
+                
+                // Reset conditional input
+                const inputLainnya = document.getElementById('input_lainnya_container');
+                if (inputLainnya) {
+                    inputLainnya.classList.add('hidden');
+                }
+            });
+        }
 
         // Inisialisasi
         showStep(currentStep);
+    });
     </script>
 
 </body>

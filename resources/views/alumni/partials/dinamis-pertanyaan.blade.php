@@ -1,28 +1,36 @@
 <div class="space-y-6">
-    @foreach ($questions as $index => $question)
+    @foreach ($questions as $question)
         @php
-            $conditions = $question->questionConditions
-                ?->filter(fn($c) => $c->field === 'employment_status')
-                ?->pluck('value_status_kerja')
-                ?->toArray() ?? [];
+        $conditions = optional($question->questionConditions)
+            ->filter(fn($c) => $c->field === 'employment_status')
+            ->pluck('value_status_kerja')
+            ->toArray() ?? [];
+
+        if (!is_array($conditions)) {
+            $conditions = [];
+        }
+
         @endphp
 
-        <div class="space-y-2 conditional-question {{ !empty($conditions) ? 'hidden' : '' }}" 
-             data-condition-field="employment_status" 
+        {{-- WRAP SETIAP PERTANYAAN DENGAN CARD --}}
+        <div class="w-full bg-white p-9 rounded shadow mb-6 conditional-question {{ !empty($conditions) ? 'hidden' : '' }}"
+             data-condition-field="employment_status"
              data-condition-values="{{ implode(',', $conditions) }}">
-             
-            <label class="block font-medium text-gray-700">
-                <span class="font-bold text-lg">{{ $index + 1 }}. </span>{{ $question->question_text }}
+
+            {{-- Label Pertanyaan --}}
+            <label class="block font-semibold text-base text-gray-700 mb-3">
+                {{ $question->question_text }}
                 @if ($question->is_required)
                     <span class="text-red-600">*</span>
                 @endif
             </label>
 
+            {{-- Input Field Berdasarkan Tipe --}}
             @switch($question->questiontype?->name)
                 @case('text')
-                    <input type="text" name="answers[{{ $question->id }}]" 
+                    <input type="text" name="answers[{{ $question->id }}]"
                         {{ $question->is_required ? 'required' : '' }}
-                        class="w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        class="w-full sm:w-1/2 border-0 border-b border-gray-300 focus:ring-0 focus:border-orange-600 py-2 bg-transparent text-base">
                     @break
 
                 @case('textarea')
@@ -47,7 +55,8 @@
                     <div class="space-y-2">
                         @foreach ($question->options as $option)
                             <label class="inline-flex items-center">
-                                <input type="checkbox" name="answers[{{ $question->id }}][]" value="{{ $option->option_text }}" class="w-5 h-5 text-blue-600">
+                                <input type="checkbox" name="answers[{{ $question->id }}][]" value="{{ $option->option_text }}"
+                                    class="w-5 h-5 text-blue-600">
                                 <span class="ml-2">{{ $option->option_text }}</span>
                             </label>
                         @endforeach
@@ -55,9 +64,9 @@
                     @break
 
                 @case('select')
-                    <select name="answers[{{ $question->id }}]" 
+                    <select name="answers[{{ $question->id }}]"
                         {{ $question->is_required ? 'required' : '' }}
-                        class="w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        class="w-full sm:w-1/2 mt-2 border-0 border-b border-gray-300 focus:ring-0 focus:border-orange-600 py-2 bg-transparent text-base">
                         <option value="">-- Pilih --</option>
                         @foreach ($question->options as $option)
                             <option value="{{ $option->option_text }}">{{ $option->option_text }}</option>
@@ -66,7 +75,7 @@
                     @break
 
                 @case('scale')
-                    <div class="flex flex-wrap gap-4">
+                    <div class="flex flex-wrap gap-4 mt-2">
                         @foreach ($question->options as $option)
                             <label class="flex flex-col items-center w-16">
                                 <input type="radio" name="answers[{{ $question->id }}]" value="{{ $option->option_text }}"
@@ -80,26 +89,26 @@
                 @case('matrix')
                     @if ($rows->count() && $columns->count())
                         <div class="overflow-x-auto">
-                            <table class="min-w-full border border-gray-300">
-                                <thead class="bg-gray-100">
+                            <table class="min-w-full border border-gray-300 text-sm">
+                                <thead class="bg-gray-100 text-center">
                                     <tr>
-                                        <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Pernyataan</th>
+                                        <th class="border px-4 py-2 text-left">Pernyataan</th>
                                         @foreach ($columns as $column)
-                                            <th class="px-4 py-2 text-center text-sm font-medium text-gray-700">{{ $column }}</th>
+                                            <th class="border px-4 py-2">{{ $column }}</th>
                                         @endforeach
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($rows as $row)
-                                        <tr>
-                                            <td class="px-4 py-2 text-sm text-gray-800">{{ $row }}</td>
+                                        <tr class="even:bg-gray-50">
+                                            <td class="border px-4 py-2">{{ $row }}</td>
                                             @foreach ($columns as $column)
-                                                <td class="text-center">
-                                                    <input type="radio" 
-                                                        name="answers[{{ $question->id }}][{{ $row }}]" 
+                                                <td class="border px-4 py-2 text-center">
+                                                    <input type="radio"
+                                                        name="answers[{{ $question->id }}][{{ $row }}]"
                                                         value="{{ $column }}"
                                                         {{ $question->is_required ? 'required' : '' }}
-                                                        class="text-indigo-600 focus:ring-indigo-500">
+                                                        class="form-radio text-orange-600 focus:ring-orange-500">
                                                 </td>
                                             @endforeach
                                         </tr>
@@ -111,8 +120,9 @@
                     @break
             @endswitch
 
+            {{-- Error Message --}}
             @error('answers.' . $question->id)
-                <p class="text-sm text-red-500">{{ $message }}</p>
+                <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
             @enderror
         </div>
     @endforeach
