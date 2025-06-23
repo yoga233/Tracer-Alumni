@@ -47,6 +47,7 @@
 
             <div class="step hidden" id="step2">
                 @include('alumni.partials.dinamis-pertanyaan')
+                <br>
                 @include('alumni.partials.kompetensi_saat_lulus')
             </div>
 
@@ -137,24 +138,26 @@
         }
 
         // Delay untuk memastikan script validasi sudah selesai
-        setTimeout(() => {
-            if (nextBtn) {
+              if (nextBtn) {
                 nextBtn.addEventListener('click', function(e) {
-                    // Jangan preventDefault di sini, biarkan script validasi yang handle
-                    
-                    // Tunggu sebentar untuk memastikan validasi selesai
-                    setTimeout(() => {
-                        // Cek apakah ada error validasi
-                        const hasErrors = document.querySelector('.validation-error');
-                        
-                        if (!hasErrors && currentStep < totalSteps) {
-                            currentStep++;
-                            showStep(currentStep);
+                    const currentStepEl = steps[currentStep - 1];
+                    const inputs = currentStepEl.querySelectorAll('input, select, textarea');
+
+                    let isValid = true;
+                    inputs.forEach(input => {
+                        if (!input.checkValidity()) {
+                            input.reportValidity(); // Trigger pesan error bawaan browser
+                            isValid = false;
                         }
-                    }, 50);
+                    });
+
+                    if (isValid && currentStep < totalSteps) {
+                        currentStep++;
+                        showStep(currentStep);
+                    }
                 });
             }
-        }, 100);
+
 
         if (prevBtn) {
             prevBtn.addEventListener('click', function(e) {
