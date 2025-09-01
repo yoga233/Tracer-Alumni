@@ -9,19 +9,20 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    // Migration untuk questions table
     public function up(): void
     {
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
+
             $table->text('question_text');
+
             $table->foreignId('question_type_id')
                 ->constrained('question_types')
                 ->onDelete('cascade');
 
-            
-            $table->json('options')->nullable();
-            $table->json('scale_labels')->nullable();
+            $table->boolean('is_required')->default(false);
+
+            $table->json('scale_labels')->nullable(); 
 
             $table->timestamps();
         });

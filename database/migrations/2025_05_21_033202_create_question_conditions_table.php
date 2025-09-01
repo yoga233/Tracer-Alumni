@@ -9,26 +9,23 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    // database/migrations/xxxx_xx_xx_create_alumnis_table.php
-
-public function up()
-{
-    Schema::create('alumnis', function (Blueprint $table) {
+    public function up(): void
+    {
+       Schema::create('question_conditions', function (Blueprint $table) {
         $table->id();
-        $table->string('name');
-        $table->string('email')->unique();
-        $table->string('major');
-        $table->year('graduation_year');
+        $table->foreignId('question_id')->constrained('questions')->onDelete('cascade');
+        $table->string('field'); 
+        $table->string('value_status_kerja'); 
         $table->timestamps();
-    });
-}
+});
 
+    }
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('alumnis');
+        Schema::dropIfExists('question_conditions');
     }
 };
