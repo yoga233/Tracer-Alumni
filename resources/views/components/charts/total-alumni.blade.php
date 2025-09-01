@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+{{-- document.addEventListener('DOMContentLoaded', function () {
     const chartWrapper = document.getElementById('alumniChartWrapper');
     const labels = JSON.parse(chartWrapper.getAttribute('data-labels'));
     const data = JSON.parse(chartWrapper.getAttribute('data-data'));
@@ -28,4 +28,4 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
-});
+}); --}}
